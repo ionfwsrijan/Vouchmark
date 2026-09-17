@@ -4,6 +4,7 @@ interface Props {
   cases: Case[];
   open: boolean;
   onToggle: () => void;
+  onSelect?: (caseId: string) => void;
 }
 
 const LABEL_DOT: Record<string, string> = {
@@ -12,7 +13,7 @@ const LABEL_DOT: Record<string, string> = {
   NEEDS_INPUT: "amber",
 };
 
-export function HistoryDrawer({ cases, open, onToggle }: Props) {
+export function HistoryDrawer({ cases, open, onToggle, onSelect }: Props) {
   return (
     <div className="history">
       <button
@@ -36,16 +37,21 @@ export function HistoryDrawer({ cases, open, onToggle }: Props) {
             <ul className="history-list">
               {cases.map((c) => (
                 <li key={c.caseId} className="history-item">
-                  <span className={`verdict-dot ${LABEL_DOT[c.verdictLabel ?? ""] ?? "amber"}`} />
-                  <div>
-                    <div className="history-title">
-                      {c.digest?.headline || c.verdictLabel || "Cheque"}
+                  {onSelect ? (
+                    <button
+                      className="history-open"
+                      onClick={() => onSelect(c.caseId)}
+                      title="Reopen this analysis"
+                    >
+                      <span className={`verdict-dot ${LABEL_DOT[c.verdictLabel ?? ""] ?? "amber"}`} />
+                      <HistoryBody c={c} />
+                    </button>
+                  ) : (
+                    <div className="history-row">
+                      <span className={`verdict-dot ${LABEL_DOT[c.verdictLabel ?? ""] ?? "amber"}`} />
+                      <HistoryBody c={c} />
                     </div>
-                    <div className="history-sub">
-                      {c.digest?.insurer || "—"} · {formatDate(c.createdAt)} · score{" "}
-                      {c.fightScore ?? "–"}
-                    </div>
-                  </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -53,6 +59,20 @@ export function HistoryDrawer({ cases, open, onToggle }: Props) {
         </div>
       )}
     </div>
+  );
+}
+
+function HistoryBody({ c }: { c: Case }) {
+  return (
+    <>
+      <div className="history-title">
+        {c.digest?.headline || c.verdictLabel || "Cheque"}
+      </div>
+      <div className="history-sub">
+        {c.digest?.insurer || "—"} · {formatDate(c.createdAt)} · score{" "}
+        {c.fightScore ?? "–"}
+      </div>
+    </>
   );
 }
 

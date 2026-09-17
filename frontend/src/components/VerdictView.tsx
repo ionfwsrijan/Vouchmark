@@ -1,10 +1,16 @@
 import type { Analysis, VerdictLabel } from "../types";
 import { FightScore } from "./FightScore";
 import { LetterBlock } from "./LetterBlock";
+import { caseToCsv, downloadCsv } from "../lib/exportCsv";
 
 interface Props {
   analysis: Analysis;
   onReload: () => void;
+}
+
+function exportAsCsv(analysis: Analysis): void {
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadCsv(`vouchmark-case-${stamp}.csv`, caseToCsv(analysis));
 }
 
 type Tone = "clay" | "ok" | "amber";
@@ -116,12 +122,18 @@ export function VerdictView({ analysis, onReload }: Props) {
 
       <p className="disclaimer">{analysis.disclaimer}</p>
 
-      <div className="meta-row">
+      <div className="meta-row no-print">
         <span className="chip">model {analysis.meta.modelId}</span>
         <span className="chip">
           {analysis.generatedVia === "demo" ? "demo pipeline" : "Bedrock + Guardrails"}
         </span>
         <span className="chip">language {analysis.language}</span>
+        <button className="ghost-btn small" onClick={() => window.print()}>
+          Print / PDF
+        </button>
+        <button className="ghost-btn small" onClick={() => exportAsCsv(analysis)}>
+          Export CSV
+        </button>
         <button className="ghost-btn small" onClick={onReload}>
           Try another letter
         </button>

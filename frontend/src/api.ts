@@ -2,6 +2,7 @@ import type {
   Analysis,
   AnalyzeResponse,
   Case,
+  CaseDetailResponse,
   ContextInput,
 } from "./types";
 import { apiBase } from "./lib/config";
@@ -87,6 +88,17 @@ export async function fetchCases(): Promise<Case[]> {
     `/cases?deviceId=${encodeURIComponent(deviceId)}`,
   );
   return payload.cases || [];
+}
+
+export async function fetchCase(caseId: string): Promise<Analysis> {
+  const deviceId = getDeviceId();
+  const payload = await http<CaseDetailResponse>(
+    `/cases/${encodeURIComponent(caseId)}?deviceId=${encodeURIComponent(deviceId)}`,
+  );
+  if (!payload.ok || !payload.case?.analysis) {
+    throw new ApiError(payload.error || "That case could not be opened.");
+  }
+  return payload.case.analysis;
 }
 
 export function fileToBase64(file: File): Promise<string> {

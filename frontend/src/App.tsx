@@ -3,6 +3,7 @@ import type { Analysis, Case, ContextInput } from "./types";
 import {
   ApiError,
   analyze,
+  fetchCase,
   fetchCases,
   prepareFile,
 } from "./api";
@@ -137,6 +138,24 @@ export default function App() {
     setPastedText(SAMPLE_LETTER);
     setErrorMsg(null);
     setStatus("idle");
+  }
+
+  async function openCase(caseId: string) {
+    setStatus("working");
+    setErrorMsg(null);
+    try {
+      const analysis = await fetchCase(caseId);
+      setResult(analysis);
+      setStatus("done");
+      setShowHistory(false);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(
+        err instanceof ApiError
+          ? err.message
+          : "Could not open that case. It may have expired.",
+      );
+    }
   }
 
   const inputReady =
@@ -293,6 +312,7 @@ export default function App() {
           cases={history}
           open={showHistory}
           onToggle={() => setShowHistory((s) => !s)}
+          onSelect={openCase}
         />
       )}
 

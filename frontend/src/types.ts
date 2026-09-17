@@ -38,6 +38,9 @@ export interface Extraction {
   amount_claimed: number | null;
   amount_rejected: number | null;
   rejection_date: string | null;
+  policy_start_date: string | null;
+  sum_insured: number | null;
+  policy_holder_name: string | null;
   reasons: { text: string; category: string; confidence: number }[];
   context_notes: string;
 }
@@ -76,6 +79,22 @@ export interface Case {
   fightScore?: number;
   language?: string;
   digest?: CaseDigest;
+}
+
+export interface CaseDetail {
+  caseId: string;
+  createdAt?: string;
+  verdictLabel?: string;
+  fightScore?: number;
+  language?: string;
+  digest?: CaseDigest;
+  analysis?: Analysis;
+}
+
+export interface CaseDetailResponse {
+  ok: boolean;
+  case?: CaseDetail;
+  error?: string;
 }
 
 export interface DeviceConfig {
