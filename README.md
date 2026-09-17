@@ -27,15 +27,20 @@ how these get re-examined.
 ## What it does
 
 1. **Reads the letter** — upload a photo/PDF or paste the text. Amazon Bedrock
-   (Claude, vision) extracts the insurer's exact stated reasons.
+   (Claude, vision) extracts the insurer's exact stated reasons plus policy
+   metadata (policy/claim numbers, holder, start date, sum insured).
 2. **Scores each reason** against a plain rulebook of how Indian health
    policies actually behave: `weak` (contestable), `undetermined` (curable),
-   `strong` (looks valid).
+   `strong` (looks valid) — and hands back a per-reason **action guide**.
 3. **Drafts the counter letter** — with the evidence list per reason, a 30-day
    written-decision request, and the Bima Bharosa / grievance escalation path.
-4. **Keeps a private history** of checks per device. No login, no account.
+4. **Keeps a private history** of checks per device — reopen any past result,
+   print it to PDF, or export the reason-by-reason CSV. No login, no account.
 
 All output is informational, guarded so it never promises an outcome.
+See [`docs/IRDAI_GUIDE.md`](docs/IRDAI_GUIDE.md) for the regulatory reasoning
+and [`docs/PRIVACY.md`](docs/PRIVACY.md) for what touches the network and the
+store.
 
 ## The 60-second story for judges
 
@@ -65,15 +70,30 @@ vouchmark/
 │  │  ├─ demo.py                  # offline demo pipeline (no account)
 │  │  ├─ ddb.py                   # DynamoDB persistence (best-effort)
 │  │  ├─ prompts.py / models.py
-│  ├─ tests/                      # 30 pytest tests, no AWS required
+│  ├─ tests/                      # 104 pytest tests, no AWS required
 │  ├─ samples/letters/            # redacted sample rejection letters
 │  ├─ scripts/                    # create-guardrail / deploy-backend / deploy-frontend / run-local
 │  └─ tools/local_server.py       # HTTP server for the offline demo
 ├─ frontend/
-│  ├─ src/                        # Vite + React + TypeScript SPA
+│  ├─ src/                        # Vite + React + TypeScript SPA (18 vitest tests)
 │  └─ public/config.js            # runtime-injected API URL
-└─ docs/                          # ARCHITECTURE, DEMO_SCRIPT, BLOG_DRAFT
+├─ .github/workflows/ci.yml       # pytest + typecheck + build on every push
+└─ docs/                          # ARCHITECTURE, DEMO_SCRIPT, BLOG_DRAFT, IRDAI_GUIDE, PRIVACY
 ```
+
+---
+
+## Depth, at a glance
+
+| Layer | What's behind it |
+|---|---|
+| **Rules engine** | 15-category rejection taxonomy, alias normalisation, context-aware verdict, deterministic and fully unit-tested (`rules.py`). |
+| **Pipeline** | Bedrock extraction → rules → letter, with a parsed-JSON retry, a deterministic letter fallback, and an offline demo twin that shares the exact same engine. |
+| **Safety rails** | Bedrock Guardrails config, a file-signature sniffer on uploads, size/MIME/language whitelists, and structured error codes (`code` field) on every 4xx/5xx. |
+| **Case store** | Per-device DynamoDB rows, full-analysis persistence, `GET /cases/{id}`, cursor pagination, optional TTL. |
+| **Frontend** | Client-side image downscale, N-language output, bilingual chrome (English/Hinglish), reopen-history, print-to-PDF, CSV export. |
+| **Testing** | 104 backend pytest + 18 frontend vitest; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
+| **Docs** | `docs/ARCHITECTURE.md`, `docs/IRDAI_GUIDE.md`, `docs/PRIVACY.md`, `docs/DEMO_SCRIPT.md`, `docs/BLOG_DRAFT.md`. |
 
 ---
 
