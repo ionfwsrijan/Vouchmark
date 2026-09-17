@@ -11,17 +11,12 @@ import { Dropzone } from "./components/Dropzone";
 import { ContextPanel } from "./components/ContextPanel";
 import { VerdictView } from "./components/VerdictView";
 import { HistoryDrawer } from "./components/HistoryDrawer";
+import { uiStrings } from "./i18n";
 
 type Tab = "upload" | "paste";
 type Status = "idle" | "working" | "done" | "error";
 
 const LANGUAGES = ["English", "Hinglish", "Hindi", "Tamil", "Telugu", "Bengali"];
-
-const WORK_PHASES = [
-  "Reading the letter…",
-  "Checking each reason against policy rules…",
-  "Drafting your reply letter…",
-];
 
 const SAMPLE_LETTER = `Example Health & Allied Insurance Co. Ltd.
 Claim No: CLM20260828-00741  |  Policy No: EHAI/FLA/21/ID-0012354
@@ -50,6 +45,8 @@ export default function App() {
   const [language, setLanguage] = useState("Hinglish");
   const [context, setContext] = useState<ContextInput>({});
   const [showContext, setShowContext] = useState(false);
+
+  const t = uiStrings(language);
 
   const [status, setStatus] = useState<Status>("idle");
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -169,12 +166,12 @@ export default function App() {
           <img src="./favicon.svg" alt="" width="34" height="34" />
           <div>
             <span className="brand-name">Vouchmark</span>
-            <span className="brand-tag">your rejection, vouched</span>
+            <span className="brand-tag">{t.brandTag}</span>
           </div>
         </div>
         <div className="topbar-actions">
           <select
-            aria-label="Output language"
+            aria-label={t.outputLangLabel}
             className="lang-select"
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
@@ -186,7 +183,7 @@ export default function App() {
             ))}
           </select>
           <button className="ghost-btn" onClick={loadSample}>
-            Try a sample
+            {t.trySample}
           </button>
         </div>
       </header>
@@ -200,7 +197,7 @@ export default function App() {
               className={tab === "upload" ? "tab active" : "tab"}
               onClick={() => setTab("upload")}
             >
-              Upload a letter
+              {t.uploadTab}
             </button>
             <button
               role="tab"
@@ -208,7 +205,7 @@ export default function App() {
               className={tab === "paste" ? "tab active" : "tab"}
               onClick={() => setTab("paste")}
             >
-              Paste the text
+              {t.pasteTab}
             </button>
           </div>
 
@@ -224,11 +221,11 @@ export default function App() {
           ) : (
             <textarea
               className="paste-area"
-              placeholder="Paste the exact wording of the rejection letter… policy number, the reasons for rejection, amounts, dates."
+              placeholder={t.pastePlaceholder}
               value={pastedText}
               onChange={(e) => setPastedText(e.target.value)}
               rows={12}
-              aria-label="Rejection letter text"
+              aria-label={t.textareaLabel}
             />
           )}
 
@@ -237,8 +234,8 @@ export default function App() {
             onClick={() => setShowContext((s) => !s)}
             aria-expanded={showContext}
           >
-            {showContext ? "Hide optional details" : "Add optional details"} (makes the
-            verdict sharper)
+            {showContext ? t.contextHide : t.contextShow} (makes the verdict
+            sharper)
           </button>
           {showContext && (
             <ContextPanel value={context} onChange={setContext} />
@@ -247,7 +244,7 @@ export default function App() {
           {status === "working" && (
             <div className="progress" role="status" aria-live="polite">
               <span className="spinner" />
-              <span>{WORK_PHASES[phaseIndex]}</span>
+              <span>{t.workPhases[phaseIndex]}</span>
             </div>
           )}
 
@@ -265,13 +262,10 @@ export default function App() {
                 tab === "upload" && file ? handleUpload(file) : handlePaste()
               }
             >
-              {status === "working" ? "Analysing…" : "Check this rejection"}
+              {status === "working" ? t.analysing : t.checkRejection}
             </button>
           </div>
-          <p className="fine-print">
-            Your letter is analysed, not stored as text by anyone. No login, no
-            account. Informational only — never a promise.
-          </p>
+          <p className="fine-print">{t.finePrint}</p>
         </section>
 
         <section className="panel result-panel" aria-label="Result">
@@ -279,28 +273,18 @@ export default function App() {
             <VerdictView analysis={result} onReload={loadSample} />
           ) : (
             <div className="empty-state">
-              <h2>If an insurer says “no”, is that the whole story?</h2>
-              <p>
-                Upload the rejection letter, or paste its wording. We extract each
-                stated reason, check it against how Indian health policies actually
-                behave, and draft a counter letter a real person can send.
-              </p>
+              <h2>{t.emptyH2}</h2>
+              <p>{t.emptyP}</p>
               <ol className="how-it-works">
-                <li>
-                  <strong>Bedrock vision</strong> reads the letter (even a photo), in
-                  English, Hindi, Tamil, Telugu or Bengali.
-                </li>
-                <li>
-                  <strong>Rules, not vibes</strong> — each reason is scored: weak
-                  ground, curable, or looks valid.
-                </li>
-                <li>
-                  <strong>A letter you can actually send</strong>, plus the evidence
-                  list that makes it stick.
-                </li>
+                {t.how.map(([title, body], index) => (
+                  <li key={index}>
+                    <strong>{title}</strong>
+                    {body}
+                  </li>
+                ))}
               </ol>
               <button className="ghost-btn" onClick={loadSample}>
-                Watch it work on a sample letter →
+                {t.watchSample}
               </button>
             </div>
           )}
@@ -313,13 +297,11 @@ export default function App() {
           open={showHistory}
           onToggle={() => setShowHistory((s) => !s)}
           onSelect={openCase}
+          copy={{ heading: t.historyHeading, empty: t.historyEmpty }}
         />
       )}
 
-      <footer className="foot">
-        Built for the AWS First Commit hackathon · Amazon Bedrock + Lambda + API
-        Gateway + DynamoDB + CloudFront · a rejection is a disagreement, not a verdict
-      </footer>
+      <footer className="foot">{t.footer}</footer>
     </div>
   );
 }

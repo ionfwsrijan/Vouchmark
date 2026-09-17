@@ -5,6 +5,7 @@ interface Props {
   open: boolean;
   onToggle: () => void;
   onSelect?: (caseId: string) => void;
+  copy?: { heading: string; empty: string };
 }
 
 const LABEL_DOT: Record<string, string> = {
@@ -13,7 +14,9 @@ const LABEL_DOT: Record<string, string> = {
   NEEDS_INPUT: "amber",
 };
 
-export function HistoryDrawer({ cases, open, onToggle, onSelect }: Props) {
+export function HistoryDrawer({ cases, open, onToggle, onSelect, copy }: Props) {
+  const heading = copy?.heading ?? "Past checks on this device";
+  const empty = copy?.empty ?? "Nothing here yet — your first check will appear.";
   return (
     <div className="history">
       <button
@@ -30,9 +33,9 @@ export function HistoryDrawer({ cases, open, onToggle, onSelect }: Props) {
       </button>
       {open && (
         <div className="history-panel">
-          <h3>Past checks on this device</h3>
+          <h3>{heading}</h3>
           {cases.length === 0 ? (
-            <p className="fine-print">Nothing here yet — your first check will appear.</p>
+            <p className="fine-print">{empty}</p>
           ) : (
             <ul className="history-list">
               {cases.map((c) => (
