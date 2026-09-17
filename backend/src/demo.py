@@ -27,6 +27,9 @@ def demo_extraction_raw() -> dict:
         "amountClaimed": 682000.0,
         "amountRejected": 682000.0,
         "rejectionDate": "2026-09-02",
+        "policyStartDate": "2021-04-14",
+        "sumInsured": 500000.0,
+        "policyHolderName": "[policy holder name]",
         "reasons": [
             {
                 "text": (

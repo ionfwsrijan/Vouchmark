@@ -52,6 +52,9 @@ EXTRACTION_SCHEMA = """{
   "amountClaimed": "number in INR or null",
   "amountRejected": "number in INR or null",
   "rejectionDate": "ISO date YYYY-MM-DD or null",
+  "policyHolderName": "the policy holder's name if present, else null",
+  "policyStartDate": "ISO date the policy began (YYYY-MM-DD) if present, else null",
+  "sumInsured": "the sum insured in INR if present, else null",
   "reasons": [
     {
       "text": "exact quote of the reason from the letter",

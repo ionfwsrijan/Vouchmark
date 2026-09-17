@@ -56,6 +56,9 @@ class Extraction:
     amount_claimed: Optional[float] = None
     amount_rejected: Optional[float] = None
     rejection_date: Optional[str] = None
+    policy_start_date: Optional[str] = None
+    sum_insured: Optional[float] = None
+    policy_holder_name: Optional[str] = None
     reasons: list[dict] = field(default_factory=list)  # [{text, category, confidence}]
     context_notes: str = ""
 

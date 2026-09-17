@@ -28,8 +28,12 @@ def build_counter_letter(
     policy = extraction.get("policy_number") or "[policy number]"
     claim = extraction.get("claim_number") or "[claim number]"
     patient = extraction.get("patient_name") or "[insured name]"
+    holder = extraction.get("policy_holder_name") or patient or "[policy holder name]"
     diagnosis = extraction.get("diagnosis") or "the treatment"
     hospital = extraction.get("hospital") or "[hospital name]"
+    policy_start = extraction.get("policy_start_date") or "[policy start date]"
+    sum_insured = extraction.get("sum_insured") or None
+    rejection_date = extraction.get("rejection_date") or "[date of the letter]"
 
     weak = [a for a in assessments if a["grounds_strength"] == "weak"]
     undetermined = [a for a in assessments if a["grounds_strength"] == "undetermined"]
@@ -54,9 +58,11 @@ To:
 The Grievance Officer / Claims Department
 {insurer}
 
-Re: Request for reconsideration
+Re: Request for reconsideration — {diagnosis}
 Policy No: {policy} | Claim No: {claim}
 Patient / Insured: {patient}
+Policy holder: {holder}
+Rejection letter dated: {rejection_date}
 
 Dear Sir/Madam,
 
@@ -77,7 +83,9 @@ If I do not receive a response in that time, my next step will be to raise
 this under IRDAI's grievance mechanism (Bima Bharosa) and the consumer
 ombudsman service.
 
-Doc references:
+Facts from the letter:
+- Policy started: {policy_start}
+- Sum insured: {_fmt(sum_insured)}
 - Claimed amount: {_fmt(ctx.amount_claimed)}
 - Rejected amount: {_fmt(ctx.amount_rejected)}
 

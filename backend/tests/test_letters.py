@@ -43,3 +43,18 @@ def test_letter_includes_amount_references_when_given():
 def test_letter_uses_placeholders_when_amounts_missing():
     letter = demo_analysis()["analysis"]["letter"]
     assert "[amount in INR]" in letter
+
+
+def test_metadata_from_letter_appears_in_draft():
+    out = demo_analysis()
+    letter = out["analysis"]["letter"]
+    assert "Policy started: 2021-04-14" in letter
+    assert "Sum insured: Rs. 500,000" in letter
+    assert "Rejection letter dated: 2026-09-02" in letter
+
+
+def test_extraction_metadata_is_public():
+    ex = demo_analysis()["analysis"]["extraction"]
+    assert ex["policy_holder_name"] == "[policy holder name]"
+    assert ex["policy_start_date"] == "2021-04-14"
+    assert ex["sum_insured"] == 500000.0

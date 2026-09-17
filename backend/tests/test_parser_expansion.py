@@ -47,3 +47,24 @@ def test_confidence_is_coerced_to_float():
 def test_document_type_defaults_to_unknown():
     e = extraction_from_dict({})
     assert e.document_type == "unknown"
+
+
+def test_new_metadata_fields_map_from_snake_json():
+    e = extraction_from_dict(
+        {
+            "documentType": "claim_rejection",
+            "policyHolderName": "Anita Sharma",
+            "policyStartDate": "2021-04-14",
+            "sumInsured": "10,00,000",
+        }
+    )
+    assert e.policy_holder_name == "Anita Sharma"
+    assert e.policy_start_date == "2021-04-14"
+    assert e.sum_insured == 1000000.0
+
+
+def test_missing_metadata_stays_none():
+    e = extraction_from_dict({"documentType": "claim_rejection"})
+    assert e.policy_holder_name is None
+    assert e.policy_start_date is None
+    assert e.sum_insured is None

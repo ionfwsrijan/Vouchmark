@@ -99,6 +99,9 @@ def extraction_from_dict(data: dict) -> Extraction:
         amount_claimed=_to_float(data.get("amountClaimed")),
         amount_rejected=_to_float(data.get("amountRejected")),
         rejection_date=_str_or_none(data.get("rejectionDate")),
+        policy_start_date=_str_or_none(data.get("policyStartDate")),
+        sum_insured=_to_float(data.get("sumInsured")),
+        policy_holder_name=_str_or_none(data.get("policyHolderName")),
         reasons=reasons,
         context_notes=str(data.get("contextNotes") or "")[:600],
     )
