@@ -102,6 +102,13 @@ vouchmark/
 Requirements: Node 18+, Python 3.10+.
 
 ```powershell
+.\dev.ps1 setup      # npm ci + pip install
+.\dev.ps1 serve      # full offline demo on http://localhost:8000
+```
+
+Or step through it manually:
+
+```powershell
 cd frontend
 npm install
 cd ..
@@ -160,6 +167,9 @@ backend\scripts\deploy-frontend.ps1
 - Model id is a stack parameter (`BedrockModelId`), default
   `anthropic.claude-sonnet-4-20250514`. Change it if your region needs a
   different id.
+- `backend/samconfig.toml` holds the sane defaults (`sam build && sam deploy`
+  from `backend/` works with no flag gymnastics); guardrail ids are passed on
+  the command line, never committed.
 - Environment variables the function reads: `DEMO_MODE`, `BEDROCK_MODEL_ID`,
   `GUARDRAIL_ID`, `GUARDRAIL_VERSION`, `CASES_TABLE`, `ALLOWED_ORIGIN`.
 - No PII is stored on purpose: extraction text is capped, history is a digest.

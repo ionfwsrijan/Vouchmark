@@ -1,0 +1,19 @@
+# Run:  sam build && sam deploy  (from backend/) — or just deploy-backend.ps1
+# No secrets live here; GuardrailId/Version are passed on the command line.
+version = 0.1
+
+default:
+  [default.global.parameters]
+  stack_name = "vouchmark"
+  region = "ap-south-1"
+
+  [default.build.parameters]
+  cached = true
+  parallel = true
+
+  [default.deploy.parameters]
+  capabilities = "CAPABILITY_IAM"
+  confirm_changeset = false
+  fail_on_empty_changeset = false
+  resolve_s3 = true
+  parameter_overrides = "BedrockModelId=anthropic.claude-sonnet-4-20250514 DemoMode=false AllowedOrigin=* GuardrailId= GuardrailVersion="

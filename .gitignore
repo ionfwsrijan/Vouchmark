@@ -19,7 +19,7 @@ venv/
 
 # AWS / SAM
 .aws-sam/
-samconfig.toml
+settings.toml
 
 # Editors / OS
 .vscode/
