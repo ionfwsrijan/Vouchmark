@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from src.models import AnalysisContext
-from src.rules import RULE_BOOK, assess_all, normalize_category
+from src.rules import ACTION_GUIDES, RULE_BOOK, assess_all, normalize_category
 
 STRENGTHS = {"weak", "strong", "undetermined"}
 
@@ -53,3 +53,16 @@ def test_rules_engine_is_text_agnostic():
     # either way and still classify the category.
     a = assess_all([{"category": "other", "text": "  "}], AnalysisContext())
     assert a[0].category == "other"
+
+
+def test_action_guides_cover_every_category():
+    assert set(ACTION_GUIDES.keys()) == set(RULE_BOOK.keys())
+    for category, guide in ACTION_GUIDES.items():
+        assert guide, category
+        assert len(guide) > 40, category
+
+
+def test_assessment_carries_its_category_action_guide():
+    a = assess_all([{"category": "missing_documents"}], AnalysisContext())[0]
+    assert a.action_guide
+    assert "tracked courier" in a.action_guide.lower()

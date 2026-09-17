@@ -79,6 +79,7 @@ class Assessment:
     grounds_strength: str  # "weak" | "strong" | "undetermined"
     why: str
     evidence: list[str]
+    action_guide: str = ""
     question: str = ""
 
     @property

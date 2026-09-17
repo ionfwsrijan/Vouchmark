@@ -50,6 +50,11 @@ def build_counter_letter(
 
     lines_text = "\n\n".join(lines)
 
+    plans = "\n\n".join(
+        f"{i}) {a['label']} — {a.get('action_guide') or a['why']}"
+        for i, a in enumerate(contestable, 1)
+    )
+
     return f"""\
 DRAFT — {date.today().strftime('%d %b %Y')}
 (Review carefully before sending. Informational draft, not legal advice.)
@@ -78,6 +83,10 @@ I am attaching supporting documents as listed above and request that the
 claim be re-examined under your internal grievance process. Please confirm
 receipt of this letter and provide a written decision within 30 days of
 receipt.
+
+What I will do about each ground:
+
+{plans}
 
 If I do not receive a response in that time, my next step will be to raise
 this under IRDAI's grievance mechanism (Bima Bharosa) and the consumer

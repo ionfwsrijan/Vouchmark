@@ -14,6 +14,7 @@ export interface ReasonAssessment {
   grounds_strength: GroundsStrength;
   why: string;
   evidence: string[];
+  action_guide?: string;
   question?: string;
 }
 

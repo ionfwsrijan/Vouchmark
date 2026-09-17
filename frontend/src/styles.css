@@ -597,6 +597,16 @@ input:focus {
   margin: 8px 0 0;
 }
 
+.reason-action {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border-left: 3px solid var(--forest-2, #2f7d5b);
+  background: var(--paper-2, #f4f0e8);
+  color: var(--ink);
+}
+
 .evidence-details {
   margin-top: 8px;
   font-size: 0.82rem;

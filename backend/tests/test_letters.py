@@ -58,3 +58,15 @@ def test_extraction_metadata_is_public():
     assert ex["policy_holder_name"] == "[policy holder name]"
     assert ex["policy_start_date"] == "2021-04-14"
     assert ex["sum_insured"] == 500000.0
+
+
+def test_letter_includes_action_plan_section():
+    letter = demo_analysis()["analysis"]["letter"]
+    assert "What I will do about each ground" in letter
+    assert "Pre-existing disease (PED) exclusion" in letter
+
+
+def test_assessments_expose_action_guides():
+    for assessment in demo_analysis()["analysis"]["assessments"]:
+        assert assessment["action_guide"]
+        assert assessment["action_guide"] not in assessment["why"]

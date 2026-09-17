@@ -86,6 +86,9 @@ export function VerdictView({ analysis, onReload }: Props) {
                   <span className="reason-label">{a.label}</span>
                 </div>
                 <p className="reason-why">{a.why}</p>
+                {a.action_guide && (
+                  <p className="reason-action">→ {a.action_guide}</p>
+                )}
                 <details className="evidence-details">
                   <summary>What to attach</summary>
                   <ul className="evidence-list">

@@ -229,6 +229,89 @@ RULE_BOOK: dict[str, dict] = {
 
 VALID_CATEGORIES: set[str] = set(RULE_BOOK.keys())
 
+# One concrete "what to do next" line per category, aligned with the normal
+# Indian grievance arc: written request -> insurer's grievance officer ->
+# IRDAI's Bima Bharosa portal -> consumer ombudsman. Always informational.
+ACTION_GUIDES: dict[str, str] = {
+    "pre_existing": (
+        "Attach the first-diagnosis discharge summary and any older reports to "
+        "show when the condition actually appeared. If the policy had already run "
+        "past the PED waiting period, say so plainly and ask which policy clause "
+        "excludes your claim."
+    ),
+    "delayed_intimation": (
+        "Write a short reason for the delay (emergency, surgery, family crisis) "
+        "and attach any call/email reference. Late intimation is usually a "
+        "procedural point, not a reason to repudiate a genuine claim — ask the "
+        "insurer to name the exact clause they rely on."
+    ),
+    "missing_documents": (
+        "Ask the insurer for the exact missing checklist in writing, resubmit by "
+        "tracked courier and email, and keep every receipt. This ground is curable: "
+        "the claim is alive until the papers are short."
+    ),
+    "room_rent_cap": (
+        "Compare the settlement breakup line-by-line against the room-rent cap on "
+        "your policy schedule. If the deduction goes beyond the cap or was applied "
+        "proportionally to the whole bill, dispute the math in writing."
+    ),
+    "specific_ailment_exclusion": (
+        "Check that the exclusion appears verbatim in the signed policy document "
+        "you received at inception or renewal. Ambiguous exclusions are generally "
+        "read in the consumer's favour — ask for the exact clause."
+    ),
+    "first_year_restriction": (
+        "Check the waiting-period schedule on your policy pages and whether the "
+        "admission qualified as an emergency. If treatment fell inside a listed "
+        "window, ask the insurer to point to the exact schedule line."
+    ),
+    "cashless_refusal": (
+        "A cashless refusal is not a claim rejection. Get the refusal reason in "
+        "writing and file for reimbursement after discharge with full bills and "
+        "the discharge summary."
+    ),
+    "maternity_wait": (
+        "Compare the admission or delivery date against the maternity waiting "
+        "period printed on the policy schedule. If the date falls after the "
+        "window, attach the delivery confirmation and dispute in writing."
+    ),
+    "late_submission": (
+        "Give a plain, documented reason for the late filing and ask for "
+        "condonation in writing. Many genuine claims are re-examined once the "
+        "delay is clearly explained."
+    ),
+    "daycare_not_covered": (
+        "Ask for the policy clause that excludes this procedure, and get the "
+        "treating doctor's note confirming an overnight stay was medically "
+        "required."
+    ),
+    "unreasonable_charges": (
+        "Request a line-item explanation of which charges were seen as "
+        "unreasonable, and compare them against the hospital's package rate card. "
+        "Attach the doctor's written justification for the treatment."
+    ),
+    "out_of_cover": (
+        "Confirm the treatment against the policy cover page before investing "
+        "more effort. If it is genuinely outside cover, you can still appeal the "
+        "classification with the treating doctor's medical-necessity note."
+    ),
+    "policy_lapsed": (
+        "Verify the lapse with premium receipts and auto-debit statements. If "
+        "premiums kept being collected after the lapse date or you paid inside "
+        "the grace period, contest the lapse in writing."
+    ),
+    "amount_capped": (
+        "Ask for the signed settlement breakup: what was allowed, what was not, "
+        "and why for each item. Check every disallowed line against the policy "
+        "and dispute item-by-item."
+    ),
+    "other": (
+        "Quote the reason word-for-word in your reply and ask the insurer to name "
+        "the exact policy clause that supports it. Unusual reasons are often "
+        "mistakes or a misclassification."
+    ),
+}
+
 
 def normalize_category(category: str) -> str:
     """Map whatever the LLM or fixtures provide back to a known category."""
@@ -336,6 +419,7 @@ def assess_all(reasons: list[dict], ctx: AnalysisContext) -> list[Assessment]:
             grounds_strength=strength,
             why=why,
             evidence=rule["evidence"],
+            action_guide=ACTION_GUIDES.get(category, ""),
             question="",
         ))
     return out
