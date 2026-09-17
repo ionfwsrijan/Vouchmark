@@ -33,7 +33,19 @@ LOGGER = logging.getLogger("vouchmark")
 MAX_DOC_BYTES = 5 * 1024 * 1024          # after client-side downscale, more than enough
 MAX_TEXT_CHARS = 20_000
 VALID_MIMES = {"image/jpeg", "image/png", "image/webp", "application/pdf"}
+ALLOWED_LANGUAGES = frozenset({
+    "english", "hinglish", "hindi", "tamil", "telugu", "bengali",
+})
 SYSTEM_USER_AGENT_RE = re.compile(r"^[a-zA-Z0-9-]{1,64}$")
+
+# Leading bytes that must appear in a document for the claimed MIME type.
+# (signature, offset into the payload). All listed signatures must match.
+FILE_SIGNATURES: dict[str, list[tuple[bytes, int]]] = {
+    "image/png": [(b"\x89PNG\r\n\x1a\n", 0)],
+    "image/jpeg": [(b"\xff\xd8\xff", 0)],
+    "image/webp": [(b"RIFF", 0), (b"WEBP", 8)],
+    "application/pdf": [(b"%PDF-", 0)],
+}
 
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": os.environ.get("ALLOWED_ORIGIN", "*"),
@@ -57,12 +69,13 @@ def _ok(body: dict) -> dict:
     return _api(200, body)
 
 
-def _bad(message: str) -> dict:
-    return _api(400, {"ok": False, "error": message})
+def _fail(status: int, message: str, code: str = "error") -> dict:
+    return _api(status, {"ok": False, "code": code, "error": message})
 
 
-def _fail(status: int, message: str) -> dict:
-    return _api(status, {"ok": False, "error": message})
+def _reject(message: str, code: str = "invalid_input") -> dict:
+    """Structured 400 with a machine-checkable code, not just prose."""
+    return _fail(400, message, code)
 
 
 def _read_body(event: dict) -> dict:
@@ -83,6 +96,17 @@ def _validate_mime(mime: Optional[str]) -> str:
     return m
 
 
+def _magic_matches(mime: str, payload: bytes) -> bool:
+    """Sniff the declared MIME type against the actual bytes of the file."""
+    signatures = FILE_SIGNATURES.get(mime)
+    if not signatures:
+        return False
+    head = payload[:16]
+    return all(
+        head[offset : offset + len(sig)] == sig for sig, offset in signatures
+    )
+
+
 def _clean_device(raw: Optional[str]) -> str:
     if not raw:
         return DEFAULT_DEVICE
@@ -96,40 +120,58 @@ def handle_analyze(event: dict) -> dict:
     text = (body.get("text") or "").strip()
 
     if not document_b64 and not text:
-        return _bad(
+        return _reject(
             "Nothing to analyze. Attach a photo/PDF of the rejection letter or "
-            "paste its exact wording."
+            "paste its exact wording.",
+            "missing_input",
         )
 
     if document_b64:
         if len(document_b64) > 8 * 1024 * 1024:
-            return _bad(
+            return _reject(
                 "The attached file is too large. Try a smaller photo (the app "
-                "already downsizes images before upload)."
+                "already downsizes images before upload).",
+                "too_large",
             )
         try:
             payload_bytes = base64.b64decode(document_b64, validate=True)
         except Exception:  # noqa: BLE001
-            return _bad("The attached document is not valid base64 data.")
+            return _reject(
+                "The attached document is not valid base64 data.", "bad_base64"
+            )
         if len(payload_bytes) > MAX_DOC_BYTES:
-            return _bad(
+            return _reject(
                 "The attached file exceeds 5 MB after decoding. Please use a "
-                "smaller photo."
+                "smaller photo.",
+                "too_large",
             )
         try:
             mime = _validate_mime(body.get("mimeType"))
         except ValueError as exc:
-            return _bad(str(exc))
+            return _reject(str(exc), "unsupported_mime")
+        if not _magic_matches(mime, payload_bytes):
+            return _reject(
+                "The file does not match its declared type (its contents do not "
+                "look like the image/PDF stated). Choose the file as-is; do not "
+                "rename or convert it.",
+                "mime_mismatch",
+            )
     else:
         payload_bytes = None
         mime = ""
         if len(text) > MAX_TEXT_CHARS:
-            return _bad("The pasted text is too long. Keep it under 20,000 characters.")
+            return _reject(
+                "The pasted text is too long. Keep it under 20,000 characters.",
+                "too_large",
+            )
 
     if len(text) > MAX_TEXT_CHARS:
         text = text[:MAX_TEXT_CHARS]
 
-    language = str(body.get("language") or "English")[:40]
+    raw_language = str(body.get("language") or "English")
+    language = raw_language[:40]
+    if not language.strip() or language.strip().lower() not in ALLOWED_LANGUAGES:
+        language = "English"
     context = AnalysisContext.from_dict(body.get("context") or {})
 
     try:
@@ -146,13 +188,14 @@ def handle_analyze(event: dict) -> dict:
                 text=text,
             )
     except AnalysisError as exc:
-        return _fail(502, str(exc))
+        return _fail(502, str(exc), "model_error")
     except Exception:  # noqa: BLE001
         LOGGER.exception("Unexpected analysis failure")
         return _fail(
             500,
             "Something went wrong while analyzing the letter. Please try again; "
             "if it keeps failing, run with DEMO_MODE=1 to unblock the demo.",
+            "internal",
         )
 
     device_id = _clean_device(body.get("deviceId"))
@@ -198,6 +241,6 @@ def lambda_handler(event: dict, context: Any) -> dict:
             return handle_health()
     except Exception:  # noqa: BLE001
         LOGGER.exception("Unhandled route error")
-        return _fail(500, "Internal error.")
+        return _fail(500, "Internal error.", "internal")
 
-    return _fail(404, "Not found.")
+    return _fail(404, "Not found.", "not_found")
