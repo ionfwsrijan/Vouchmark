@@ -3,6 +3,12 @@ node_modules/
 frontend/dist/
 *.tsbuildinfo
 *.local
+coverage/
+frontend/coverage/
+
+# Logs
+*.log
+npm-debug.log*
 
 # Python
 __pycache__/
