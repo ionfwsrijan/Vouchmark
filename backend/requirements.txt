@@ -1,0 +1,6 @@
+# Runtime dependencies — the Lambda runtime already ships boto3 but we pin
+# a floor to keep local parity predictable.
+boto3>=1.35.0
+
+# Local / offline testing only (never installed into the Lambda layer)
+pytest>=8.0

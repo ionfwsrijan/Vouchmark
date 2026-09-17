@@ -1,0 +1,27 @@
+# Node / frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+*.local
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# AWS / SAM
+.aws-sam/
+samconfig.toml
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets — never commit these
+.env
+.env.*
+*.pem

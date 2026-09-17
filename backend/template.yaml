@@ -1,0 +1,204 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Vouchmark — the insurance claim rejection dispute assistant.
+  Reads a rejection letter (photo/PDF) with Amazon Bedrock vision, scores each
+  stated reason against an Indian health-policy rulebook, and drafts a counter
+  letter a family can actually send. Stack: Lambda + API Gateway + DynamoDB +
+  S3/CloudFront static frontend. Scales to zero; runs on the free-credit budget.
+
+Parameters:
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-sonnet-4-20250514
+    Description: Bedrock model id (must be enabled for your account/region).
+  DemoMode:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: true = serve canned analysis without calling Bedrock (offline demo).
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: CORS origin for the API. Set this to your CloudFront URL in prod.
+  GuardrailId:
+    Type: String
+    Default: ""
+    Description: Bedrock Guardrail id (create via scripts/create-guardrail.ps1).
+  GuardrailVersion:
+    Type: String
+    Default: ""
+    Description: Bedrock Guardrail version (e.g. 1).
+  EnableTtl:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: true = expire case rows after CasesTtlDays.
+  CasesTtlDays:
+    Type: Number
+    Default: 90
+
+Conditions:
+  EnableTtlCond: !Equals [!Ref EnableTtl, "true"]
+
+Resources:
+  CasesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: deviceId
+          AttributeType: S
+        - AttributeName: caseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: deviceId
+          KeyType: HASH
+        - AttributeName: caseId
+          KeyType: RANGE
+      TimeToLiveSpecification: !If
+        - EnableTtlCond
+        - AttributeName: expiresAt
+          Enabled: true
+        - !Ref "AWS::NoValue"
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowOrigin: !Ref AllowedOrigin
+        AllowHeaders: "'Content-Type,X-Requested-With'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+
+  ClaimAnalyzerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: analyze.lambda_handler
+      Runtime: python3.12
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          DEMO_MODE: !Ref DemoMode
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+          GUARDRAIL_ID: !Ref GuardrailId
+          GUARDRAIL_VERSION: !Ref GuardrailVersion
+          CASES_TABLE: !Ref CasesTable
+          CASES_TTL_DAYS: !Ref CasesTtlDays
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Sid: InvokeBedrock
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+        - Statement:
+            - Sid: CasesTableAccess
+              Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:Query
+                - dynamodb:PutItem
+              Resource: !GetAtt CasesTable.Arn
+      Events:
+        AnalyzeApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /analyze
+            Method: POST
+        CasesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases
+            Method: GET
+        HealthApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /health
+            Method: GET
+
+  # ---- Static frontend: S3 + CloudFront with Origin Access Control -----------
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  FrontendOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-oac"
+        Description: "OAC for the Vouchmark static site"
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        OriginAccessControlOriginType: s3
+
+  FrontendDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: FrontendBucket
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: s3Origin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !Ref FrontendOAC
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: s3Origin
+          ViewProtocolPolicy: redirect-to-https
+          Compress: true
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+        ErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: FrontendDistribution
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub
+                  - "arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}"
+                  - distributionId: !Ref FrontendDistribution
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway base URL"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  CloudFrontUrl:
+    Description: "Live frontend URL"
+    Value: !GetAtt FrontendDistribution.DomainName
+  FrontendBucketName:
+    Description: "S3 bucket holding the static site"
+    Value: !Ref FrontendBucket
+  FunctionArn:
+    Description: "Analyzer Lambda ARN"
+    Value: !GetAtt ClaimAnalyzerFunction.Arn
