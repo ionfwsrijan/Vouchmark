@@ -118,6 +118,12 @@ Resources:
             RestApiId: !Ref Api
             Path: /cases
             Method: GET
+        CaseDetailApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases/{caseId}
+            Method: GET
         HealthApi:
           Type: Api
           Properties:

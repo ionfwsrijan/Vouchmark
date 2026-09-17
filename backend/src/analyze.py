@@ -213,7 +213,24 @@ def handle_cases(event: dict) -> dict:
         limit = max(1, min(int(params.get("limit") or 10), 50))
     except ValueError:
         limit = 10
-    return _ok({"ok": True, "cases": ddb.list_cases(device_id, limit)})
+    cases, next_cursor = ddb.list_cases(device_id, limit, params.get("cursor"))
+    return _ok({"ok": True, "cases": cases, "nextCursor": next_cursor})
+
+
+def handle_case_detail(event: dict) -> dict:
+    path = event.get("pathParameters") or {}
+    device_id = _clean_device((event.get("queryStringParameters") or {}).get("deviceId"))
+    case_id = str(path.get("caseId") or "").strip()
+    if not case_id:
+        return _fail(400, "A case id is required.", "missing_case_id")
+    case = ddb.get_case(device_id, case_id)
+    if not case:
+        return _fail(
+            404,
+            "That case was not found on this device. It may have expired.",
+            "case_not_found",
+        )
+    return _ok({"ok": True, "case": case})
 
 
 def handle_health() -> dict:
@@ -235,10 +252,13 @@ def lambda_handler(event: dict, context: Any) -> dict:
     try:
         if resource.endswith("/analyze") and http_method == "POST":
             return handle_analyze(event)
-        if resource.endswith("/cases") and http_method == "GET":
-            return handle_cases(event)
-        if resource.endswith("/health") or resource == "/":
-            return handle_health()
+        if http_method == "GET":
+            if resource == "/cases" or resource.endswith("/cases"):
+                return handle_cases(event)
+            if "/cases/" in resource:
+                return handle_case_detail(event)
+            if resource.endswith("/health") or resource == "/":
+                return handle_health()
     except Exception:  # noqa: BLE001
         LOGGER.exception("Unhandled route error")
         return _fail(500, "Internal error.", "internal")

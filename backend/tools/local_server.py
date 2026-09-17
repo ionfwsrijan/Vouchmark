@@ -86,12 +86,18 @@ class Handler(BaseHTTPRequestHandler):
             "/health": "/health",
         }
         resource = resource_map.get(path, path)
+        path_params = None
+        if path.startswith("/api/cases/"):
+            case_id = path.split("/", 3)[-1]
+            resource = "/cases/{caseId}"
+            path_params = {"caseId": case_id}
 
         event = {
             "httpMethod": self.command,
             "resource": resource,
             "body": body_bytes.decode("utf-8") if body_bytes else None,
             "queryStringParameters": query,
+            "pathParameters": path_params,
         }
         try:
             result = analyze.lambda_handler(event, None)

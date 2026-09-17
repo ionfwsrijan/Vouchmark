@@ -97,6 +97,58 @@ def test_cases_without_device_returns_empty(monkeypatch):
     assert json.loads(out["body"])["cases"] == []
 
 
+def test_cases_exposes_cursor(monkeypatch):
+    from src import ddb as ddb_mod
+
+    monkeypatch.setattr(ddb_mod, "list_cases", lambda d, l, c=None: ([], "ck-1"))
+    out = _req(
+        "GET",
+        "/cases",
+        query={"deviceId": "dev", "cursor": "ck-0", "limit": "3"},
+    )
+    body = json.loads(out["body"])
+    assert body["nextCursor"] == "ck-1"
+
+
+def test_case_detail_returns_stored_analysis(monkeypatch):
+    from src import ddb as ddb_mod
+
+    monkeypatch.setattr(
+        ddb_mod,
+        "get_case",
+        lambda d, c: {"caseId": c, "analysis": {"verdict": {"label": "NEEDS_INPUT"}}},
+    )
+    out = lambda_handler(
+        {
+            "httpMethod": "GET",
+            "resource": "/cases/{caseId}",
+            "pathParameters": {"caseId": "abc"},
+            "queryStringParameters": {"deviceId": "dev"},
+        },
+        None,
+    )
+    assert out["statusCode"] == 200
+    body = json.loads(out["body"])
+    assert body["case"]["analysis"]["verdict"]["label"] == "NEEDS_INPUT"
+
+
+def test_case_detail_404_when_missing(monkeypatch):
+    from src import ddb as ddb_mod
+
+    monkeypatch.setattr(ddb_mod, "get_case", lambda d, c: None)
+    out = lambda_handler(
+        {
+            "httpMethod": "GET",
+            "resource": "/cases/{caseId}",
+            "pathParameters": {"caseId": "nope"},
+            "queryStringParameters": {"deviceId": "dev"},
+        },
+        None,
+    )
+    assert out["statusCode"] == 404
+    assert json.loads(out["body"])["code"] == "case_not_found"
+
+
 def test_unknown_route_404():
     out = _req("GET", "/nothing")
     assert out["statusCode"] == 404

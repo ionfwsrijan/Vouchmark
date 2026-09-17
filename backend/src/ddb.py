@@ -15,9 +15,11 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 _TABLE = os.environ.get("CASES_TABLE", "vouchmark-cases")
+
+MAX_LIST_LIMIT = 50
 
 
 def _ddb(use_dynamodb_local: bool = False):
@@ -60,6 +62,7 @@ def save_case(device_id: str, case_id: str, payload: dict) -> None:
             ensure_ascii=False,
             default=str,
         ),
+        "analysis": json.dumps(payload["analysis"], ensure_ascii=False, default=str),
     }
     if os.environ.get("CASES_TTL_DAYS"):
         try:
@@ -74,22 +77,31 @@ def save_case(device_id: str, case_id: str, payload: dict) -> None:
         pass
 
 
-def list_cases(device_id: str, limit: int = 10) -> list[dict]:
+def list_cases(
+    device_id: str, limit: int = 10, cursor: Optional[str] = None
+) -> tuple[list[dict], Optional[str]]:
+    """Newest-first cases for a device. Returns (items, nextCursor)."""
     if not device_id:
-        return []
+        return [], None
     try:
         table = _ddb().Table(_TABLE)
     except Exception:  # noqa: BLE001
-        return []
+        return [], None
     try:
-        resp = table.query(
-            KeyConditionExpression="deviceId = :d",
-            ExpressionAttributeValues={":d": device_id},
-            ScanIndexForward=False,  # newest first
-            Limit=max(1, min(int(limit), 50)),
-        )
+        kwargs: dict[str, Any] = {
+            "KeyConditionExpression": "deviceId = :d",
+            "ExpressionAttributeValues": {":d": device_id},
+            "ScanIndexForward": False,
+            "Limit": max(1, min(int(limit), MAX_LIST_LIMIT)),
+        }
+        if cursor:
+            kwargs["ExclusiveStartKey"] = {
+                "deviceId": device_id,
+                "caseId": cursor,
+            }
+        resp = table.query(**kwargs)
     except Exception:  # noqa: BLE001
-        return []
+        return [], None
     out: list[dict] = []
     for it in resp.get("Items", []):
         try:
@@ -103,4 +115,39 @@ def list_cases(device_id: str, limit: int = 10) -> list[dict]:
             })
         except json.JSONDecodeError:
             continue
-    return out
+    last = resp.get("LastEvaluatedKey") or {}
+    next_cursor = last.get("caseId") or None
+    return out, next_cursor
+
+
+def get_case(device_id: str, case_id: str) -> Optional[dict]:
+    """Full record for one case, including the stored analysis, or None."""
+    if not device_id or not case_id:
+        return None
+    try:
+        table = _ddb().Table(_TABLE)
+    except Exception:  # noqa: BLE001
+        return None
+    try:
+        resp = table.get_item(
+            Key={"deviceId": device_id, "caseId": case_id},
+            ConsistentRead=False,
+        )
+    except Exception:  # noqa: BLE001
+        return None
+    item = resp.get("Item")
+    if not item:
+        return None
+    try:
+        analysis = json.loads(item.get("analysis") or "{}")
+    except json.JSONDecodeError:
+        analysis = {}
+    return {
+        "caseId": item.get("caseId"),
+        "createdAt": item.get("createdAt"),
+        "verdictLabel": item.get("verdictLabel"),
+        "fightScore": item.get("fightScore"),
+        "language": item.get("language"),
+        "analysis": analysis,
+        "digest": json.loads(item.get("digest") or "{}"),
+    }
