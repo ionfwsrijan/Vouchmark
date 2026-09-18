@@ -31,9 +31,12 @@ how these get re-examined.
    metadata (policy/claim numbers, holder, start date, sum insured).
 2. **Scores each reason** against a plain rulebook of how Indian health
    policies actually behave: `weak` (contestable), `undetermined` (curable),
-   `strong` (looks valid) — and hands back a per-reason **action guide**.
+   `strong` (looks valid) — with the letter's exact wording quoted back, plus
+   a per-reason **action guide**.
 3. **Drafts the counter letter** — with the evidence list per reason, a 30-day
    written-decision request, and the Bima Bharosa / grievance escalation path.
+   It also shows **the numbers** (Indian-formatted claimed/rejected/shortfall
+   vs sum insured) and a **"gather these before you reply"** checklist.
 4. **Keeps a private history** of checks per device — reopen any past result,
    print it to PDF, or export the reason-by-reason CSV. No login, no account.
 
@@ -70,15 +73,15 @@ vouchmark/
 │  │  ├─ demo.py                  # offline demo pipeline (no account)
 │  │  ├─ ddb.py                   # DynamoDB persistence (best-effort)
 │  │  ├─ prompts.py / models.py
-│  ├─ tests/                      # 104 pytest tests, no AWS required
+│  ├─ tests/                      # 115 pytest tests, no AWS required
 │  ├─ samples/letters/            # redacted sample rejection letters
 │  ├─ scripts/                    # create-guardrail / deploy-backend / deploy-frontend / run-local
 │  └─ tools/local_server.py       # HTTP server for the offline demo
 ├─ frontend/
-│  ├─ src/                        # Vite + React + TypeScript SPA (18 vitest tests)
+│  ├─ src/                        # Vite + React + TypeScript SPA (21 vitest tests)
 │  └─ public/config.js            # runtime-injected API URL
 ├─ .github/workflows/ci.yml       # pytest + typecheck + build on every push
-└─ docs/                          # ARCHITECTURE, DEMO_SCRIPT, BLOG_DRAFT, IRDAI_GUIDE, PRIVACY
+└─ docs/                          # ARCHITECTURE, DEMO_SCRIPT, BLOG_DRAFT, IRDAI_GUIDE, PRIVACY, DEVLOG
 ```
 
 ---
@@ -91,9 +94,9 @@ vouchmark/
 | **Pipeline** | Bedrock extraction → rules → letter, with a parsed-JSON retry, a deterministic letter fallback, and an offline demo twin that shares the exact same engine. |
 | **Safety rails** | Bedrock Guardrails config, a file-signature sniffer on uploads, size/MIME/language whitelists, and structured error codes (`code` field) on every 4xx/5xx. |
 | **Case store** | Per-device DynamoDB rows, full-analysis persistence, `GET /cases/{id}`, cursor pagination, optional TTL. |
-| **Frontend** | Client-side image downscale, N-language output, bilingual chrome (English/Hinglish), reopen-history, print-to-PDF, CSV export. |
-| **Testing** | 104 backend pytest + 18 frontend vitest; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
-| **Docs** | `docs/ARCHITECTURE.md`, `docs/IRDAI_GUIDE.md`, `docs/PRIVACY.md`, `docs/DEMO_SCRIPT.md`, `docs/BLOG_DRAFT.md`. |
+| **Frontend** | Client-side image downscale, N-language output, bilingual chrome (English/Hinglish), reopen-history, print-to-PDF, CSV export, numbers card, source-quote chips, pre-reply checklist. |
+| **Testing** | 115 backend pytest + 21 frontend vitest; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
+| **Docs** | `docs/ARCHITECTURE.md`, `docs/IRDAI_GUIDE.md`, `docs/PRIVACY.md`, `docs/DEVLOG.md`, `docs/DEMO_SCRIPT.md`, `docs/BLOG_DRAFT.md`. |
 
 ---
 
