@@ -36,7 +36,7 @@ const ENGLISH: UICopy = {
   checkRejection: "Check this rejection",
   finePrint:
     "Your letter is analysed, not stored as text by anyone. No login, no account. Informational only — never a promise.",
-  emptyH2: 'If an insurer says "no", is that the whole story?',
+  emptyH2: 'If an insurer says “no”, is that the whole story?',
   emptyP:
     "Upload the rejection letter, or paste its wording. We extract each stated reason, check it against how Indian health policies actually behave, and draft a counter letter a real person can send.",
   how: [
@@ -80,7 +80,7 @@ const HINGLISH: UICopy = {
   checkRejection: "Rejection check karo",
   finePrint:
     "Aapki letter analyse hoti hai, text ke roop mein koi nahi rakhta. Na login, na account. Sirf jaankari — koi guarantee nahi.",
-  emptyH2: 'Insurer ne "no" bola — kya yehi aakhri baat hai?',
+  emptyH2: 'Insurer ne “no” bola — kya yehi aakhri baat hai?',
   emptyP:
     "Rejection letter upload karo ya uska text paste karo. Hum har reason nikaalte hain, Indian health policy ke rules se check karte hain, aur ek counter letter tayar karte hain jo aap actually bhej sakte hain.",
   how: [
