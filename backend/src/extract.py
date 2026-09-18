@@ -12,6 +12,8 @@ import re
 from typing import Any, Optional
 
 from . import bedrock
+from .claim_math import shortfall_summary
+from .completeness import preparation
 from .letters import build_counter_letter, short_summary_markdown
 from .models import AnalysisContext, Assessment, Extraction, Verdict
 from .prompts import LETTER_PROMPT_TEMPLATE, SYSTEM_PROMPT, user_extraction_prompt
@@ -244,16 +246,24 @@ def _payload(
     generated_via: str,
     meta: dict,
 ) -> dict:
+    extraction_public = extraction.to_public()
+    claimed = extraction.amount_claimed
+    rejected = extraction.amount_rejected
+    admitted = None
+    if claimed is not None and rejected is not None and rejected <= claimed:
+        admitted = claimed - rejected  # what the insurer actually paid out
     return {
         "ok": True,
         "analysis": {
-            "extraction": extraction.to_public(),
+            "extraction": extraction_public,
             "assessments": assessments,
             "verdict": verdict.to_public(),
             "letter": letter,
             "markdownSummary": short_summary_markdown(
-                extraction.to_public(), assessments, verdict.to_public()
+                extraction_public, assessments, verdict.to_public()
             ),
+            "numbers": shortfall_summary(claimed, admitted, extraction.sum_insured),
+            "preparation": preparation(extraction),
             "language": language,
             "generatedVia": generated_via,
             "meta": meta,

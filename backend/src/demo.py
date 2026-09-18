@@ -9,6 +9,8 @@ This is what powers:
 """
 from __future__ import annotations
 
+from .claim_math import shortfall_summary
+from .completeness import preparation
 from .extract import DISCLAIMER, extraction_from_dict
 from .letters import build_counter_letter, short_summary_markdown
 from .models import AnalysisContext
@@ -77,6 +79,11 @@ def demo_analysis(
     assessment_public = [a.to_public() for a in assessments]
     verdict = decide_verdict(assessments, ctx)
     letter = build_counter_letter(extraction.to_public(), assessment_public, ctx)
+    claimed = extraction.amount_claimed
+    rejected = extraction.amount_rejected
+    admitted = (claimed - rejected) if (
+        claimed is not None and rejected is not None and rejected <= claimed
+    ) else None
     return {
         "ok": True,
         "analysis": {
@@ -87,6 +94,8 @@ def demo_analysis(
             "markdownSummary": short_summary_markdown(
                 extraction.to_public(), assessment_public, verdict.to_public()
             ),
+            "numbers": shortfall_summary(claimed, admitted, extraction.sum_insured),
+            "preparation": preparation(extraction),
             "language": language,
             "generatedVia": "demo",
             "meta": {"modelId": "DEMO_MODE", "guardrail": False},
