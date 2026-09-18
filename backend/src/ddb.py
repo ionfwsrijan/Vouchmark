@@ -21,6 +21,10 @@ _TABLE = os.environ.get("CASES_TABLE", "vouchmark-cases")
 
 MAX_LIST_LIMIT = 50
 
+# In-memory fallback so the app stays fully functional WITHOUT AWS (offline
+# demo, laptop demos, Build-It track, smoke tests): persisted per-process.
+_memory: dict[tuple[str, str], dict] = {}
+
 
 def _ddb(use_dynamodb_local: bool = False):
     import boto3  # lazy
@@ -35,14 +39,7 @@ def _ddb(use_dynamodb_local: bool = False):
     return boto3.resource("dynamodb")
 
 
-def save_case(device_id: str, case_id: str, payload: dict) -> None:
-    """Best-effort write. Persistence failures must never fail the request."""
-    if not device_id or not case_id:
-        return
-    try:
-        table = _ddb().Table(_TABLE)
-    except Exception:  # noqa: BLE001 — offline laptop, no creds, nothing to save to
-        return
+def _build_item(device_id: str, case_id: str, payload: dict) -> dict:
     item: dict[str, Any] = {
         "deviceId": device_id,
         "caseId": case_id,
@@ -71,10 +68,37 @@ def save_case(device_id: str, case_id: str, payload: dict) -> None:
             )
         except ValueError:
             pass
+    return item
+
+
+def save_case(device_id: str, case_id: str, payload: dict) -> None:
+    """Best-effort write. Persistence failures must never fail the request."""
+    if not device_id or not case_id:
+        return
+    item = _build_item(device_id, case_id, payload)
+    key = (device_id, case_id)
     try:
-        table.put_item(Item=item)
-    except Exception:  # noqa: BLE001 — never break the user flow for storage
-        pass
+        _ddb().Table(_TABLE).put_item(Item=item)
+    except Exception:  # noqa: BLE001 — offline laptop / no creds: fall back to memory
+        _memory[key] = item
+
+
+def _memory_list(device_id: str, limit: int, cursor: Optional[str]) -> tuple[list[dict], Optional[str]]:
+    entries = [
+        (k, v) for k, v in _memory.items() if k[0] == device_id
+    ]
+    entries.sort(key=lambda kv: kv[1].get("createdAt", ""), reverse=True)
+    if cursor:
+        start = next(
+            (i for i, (k, _v) in enumerate(entries) if k[1] == cursor), None
+        )
+        if start is not None:
+            entries = entries[start + 1:]
+        else:
+            entries = []
+    page = entries[:limit]
+    next_cursor = page[-1][0][1] if len(page) == limit else None
+    return [_public_digest_item(v) for _k, v in page], next_cursor
 
 
 def list_cases(
@@ -83,16 +107,14 @@ def list_cases(
     """Newest-first cases for a device. Returns (items, nextCursor)."""
     if not device_id:
         return [], None
+    bounded = max(1, min(int(limit), MAX_LIST_LIMIT))
     try:
         table = _ddb().Table(_TABLE)
-    except Exception:  # noqa: BLE001
-        return [], None
-    try:
         kwargs: dict[str, Any] = {
             "KeyConditionExpression": "deviceId = :d",
             "ExpressionAttributeValues": {":d": device_id},
             "ScanIndexForward": False,
-            "Limit": max(1, min(int(limit), MAX_LIST_LIMIT)),
+            "Limit": bounded,
         }
         if cursor:
             kwargs["ExclusiveStartKey"] = {
@@ -100,21 +122,11 @@ def list_cases(
                 "caseId": cursor,
             }
         resp = table.query(**kwargs)
-    except Exception:  # noqa: BLE001
-        return [], None
+    except Exception:  # noqa: BLE001 — no DynamoDB: serve from the memory store
+        return _memory_list(device_id, bounded, cursor)
     out: list[dict] = []
     for it in resp.get("Items", []):
-        try:
-            out.append({
-                "caseId": it["caseId"],
-                "createdAt": it.get("createdAt"),
-                "verdictLabel": it.get("verdictLabel"),
-                "fightScore": it.get("fightScore"),
-                "language": it.get("language"),
-                "digest": json.loads(it.get("digest") or "{}"),
-            })
-        except json.JSONDecodeError:
-            continue
+        out.append(_public_digest_item(it))
     last = resp.get("LastEvaluatedKey") or {}
     next_cursor = last.get("caseId") or None
     return out, next_cursor
@@ -126,18 +138,33 @@ def get_case(device_id: str, case_id: str) -> Optional[dict]:
         return None
     try:
         table = _ddb().Table(_TABLE)
-    except Exception:  # noqa: BLE001
-        return None
-    try:
         resp = table.get_item(
             Key={"deviceId": device_id, "caseId": case_id},
             ConsistentRead=False,
         )
-    except Exception:  # noqa: BLE001
-        return None
+    except Exception:  # noqa: BLE001 — no DynamoDB: serve from the memory store
+        item = _memory.get((device_id, case_id))
+        return _public_case(item) if item else None
     item = resp.get("Item")
-    if not item:
-        return None
+    return _public_case(item) if item else None
+
+
+def _public_digest_item(item: dict) -> dict:
+    try:
+        digest = json.loads(item.get("digest") or "{}")
+    except json.JSONDecodeError:
+        digest = {}
+    return {
+        "caseId": item.get("caseId"),
+        "createdAt": item.get("createdAt"),
+        "verdictLabel": item.get("verdictLabel"),
+        "fightScore": item.get("fightScore"),
+        "language": item.get("language"),
+        "digest": digest,
+    }
+
+
+def _public_case(item: dict) -> dict:
     try:
         analysis = json.loads(item.get("analysis") or "{}")
     except json.JSONDecodeError:

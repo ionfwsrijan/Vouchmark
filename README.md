@@ -2,6 +2,8 @@
 
 > An insurance rejection is not a verdict. It's a claim — vouch it, then reply.
 
+![CI](https://github.com/ionfwsrijan/Vouchmark/actions/workflows/ci.yml/badge.svg)
+
 **Vouchmark** helps Indian families understand *why* a health-insurance
 claim was rejected and whether the stated reason actually holds — then drafts a
 counter letter a real person can send.
@@ -95,7 +97,7 @@ vouchmark/
 | **Safety rails** | Bedrock Guardrails config, a file-signature sniffer on uploads, size/MIME/language whitelists, and structured error codes (`code` field) on every 4xx/5xx. |
 | **Case store** | Per-device DynamoDB rows, full-analysis persistence, `GET /cases/{id}`, cursor pagination, optional TTL. |
 | **Frontend** | Client-side image downscale, N-language output, bilingual chrome (English/Hinglish), reopen-history, print-to-PDF, CSV export, numbers card, source-quote chips, pre-reply checklist. |
-| **Testing** | 115 backend pytest + 21 frontend vitest; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
+| **Testing** | 118 backend pytest + 21 frontend vitest + Playwright browser e2e (demo server); `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
 | **Docs** | `docs/ARCHITECTURE.md`, `docs/IRDAI_GUIDE.md`, `docs/PRIVACY.md`, `docs/DEVLOG.md`, `docs/DEMO_SCRIPT.md`, `docs/BLOG_DRAFT.md`. |
 
 ---
@@ -164,6 +166,15 @@ After the first deploy, tighten CORS:
 backend\scripts\deploy-backend.ps1 -AllowedOrigin "https://<your-cloudfront-domain>"
 backend\scripts\deploy-frontend.ps1
 ```
+
+### Verify the deployment (no browser needed)
+
+```powershell
+backend\scripts\verify-deploy.ps1 -ApiUrl "<the ApiUrl from the deploy output>"
+```
+
+Runs health → analyze → reopen-the-saved-case in one pass and prints the
+verdict + letter sizes. Works against the local demo server too.
 
 ### Secrets / pins
 

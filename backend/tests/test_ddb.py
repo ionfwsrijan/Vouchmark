@@ -75,3 +75,53 @@ def test_get_case_missing_returns_none(fake_table):
 
 def test_list_cases_empty_device_returns_empty():
     assert ddb.list_cases("") == ([], None)
+
+
+def _payload_for_case() -> dict:
+    return {
+        "analysis": {
+            "verdict": {"label": "LIKELY_INVALID", "fight_score": 60, "headline": "On paper"},
+            "language": "English",
+            "generatedVia": "demo",
+            "extraction": {"insurer": "X", "diagnosis": "D", "amount_rejected": 1000},
+            "assessments": [{"category": "delayed_intimation"}],
+        }
+    }
+
+
+@pytest.fixture
+def no_dynamodb(monkeypatch):
+    ddb._memory = {}
+    monkeypatch.setattr(ddb, "_ddb", lambda: (_ for _ in ()).throw(RuntimeError("no creds")))
+    yield
+    ddb._memory = {}
+
+
+def test_memory_fallback_saves_and_lists(no_dynamodb):
+    ddb.save_case("dev-mem", "c-1", _payload_for_case())
+    items, _cursor = ddb.list_cases("dev-mem")
+    assert items[0]["caseId"] == "c-1"
+    assert items[0]["digest"]["headline"] == "On paper"
+
+
+def test_memory_fallback_reopens_case_with_analysis(no_dynamodb):
+    ddb.save_case("dev-mem", "c-2", _payload_for_case())
+    case = ddb.get_case("dev-mem", "c-2")
+    assert case["analysis"]["verdict"]["label"] == "LIKELY_INVALID"
+
+
+def test_memory_fallback_is_scoped_per_device_and_paginates(no_dynamodb):
+    for i in range(5):
+        ddb.save_case("dev-a", f"c-{i}", _payload_for_case())
+        ddb.save_case("dev-b", f"c-{i}", _payload_for_case())
+    items_a, cursor_a = ddb.list_cases("dev-a", limit=2)
+    assert [i["caseId"] for i in items_a] == ["c-4", "c-3"]
+    assert cursor_a == "c-3"
+    page2, cursor_b = ddb.list_cases("dev-a", limit=2, cursor=cursor_a)
+    assert [i["caseId"] for i in page2] == ["c-2", "c-1"]
+    assert cursor_b == "c-1"
+    page3, cursor_c = ddb.list_cases("dev-a", limit=2, cursor=cursor_b)
+    assert [i["caseId"] for i in page3] == ["c-0"]
+    assert cursor_c is None
+    items_b, _ = ddb.list_cases("dev-b")
+    assert len(items_b) == 5
