@@ -421,6 +421,7 @@ def assess_all(reasons: list[dict], ctx: AnalysisContext) -> list[Assessment]:
             evidence=rule["evidence"],
             action_guide=ACTION_GUIDES.get(category, ""),
             question="",
+            source_quote=str(reason.get("text") or "")[:180].strip(),
         ))
     return out
 

@@ -81,6 +81,7 @@ class Assessment:
     evidence: list[str]
     action_guide: str = ""
     question: str = ""
+    source_quote: str = ""
 
     @property
     def is_weak(self) -> bool:
