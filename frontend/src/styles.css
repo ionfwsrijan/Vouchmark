@@ -532,6 +532,82 @@ input:focus {
   margin-right: 5px;
 }
 
+/* numbers card */
+.numbers-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 4px;
+}
+
+.numbers-card .section-title {
+  margin-top: 0;
+}
+
+.numbers-grid {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.numbers-grid div {
+  min-width: 120px;
+}
+
+.numbers-grid dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.numbers-grid dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--forest);
+}
+
+/* preparation checklist */
+.prep-card {
+  background: rgba(183, 121, 31, 0.07);
+  border: 1px dashed rgba(183, 121, 31, 0.45);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+}
+
+.prep-card .section-title {
+  margin-top: 0;
+}
+
+.prep-card .evidence-list {
+  margin-top: 6px;
+}
+
+.prep-critical {
+  font-weight: 700;
+  color: #83510f;
+}
+
+.prep-optional {
+  color: var(--ink-soft);
+}
+
+/* reasons */
+.reason-quote {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--gold);
+  background: var(--paper-2, #f4f0e8);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.84rem;
+  color: var(--ink);
+}
+
 .section-title {
   font-family: var(--serif);
   font-size: 1.05rem;

@@ -16,6 +16,7 @@ export interface ReasonAssessment {
   evidence: string[];
   action_guide?: string;
   question?: string;
+  source_quote?: string;
 }
 
 export interface Verdict {
@@ -45,12 +46,28 @@ export interface Extraction {
   context_notes: string;
 }
 
+export interface Numbers {
+  claimed: number | null;
+  admitted: number | null;
+  sumInsured: number | null;
+  shortfall: number | null;
+  note: string;
+}
+
+export interface Preparation {
+  critical: string[];
+  optional: string[];
+  note: string;
+}
+
 export interface Analysis {
   extraction: Extraction;
   assessments: ReasonAssessment[];
   verdict: Verdict;
   letter: string;
   markdownSummary: string;
+  numbers?: Numbers;
+  preparation?: Preparation;
   language: string;
   generatedVia: string;
   meta: { modelId: string; guardrail: boolean };
