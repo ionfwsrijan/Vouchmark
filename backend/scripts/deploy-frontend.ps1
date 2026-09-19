@@ -39,6 +39,29 @@ try {
     Write-Host "==> s3 sync (Bucket=$bucket)" -ForegroundColor Cyan
     aws s3 sync dist "s3://$bucket" --delete
     if ($LASTEXITCODE -ne 0) { exit 1 }
+
+    # Harden asset content types: S3's mime sniffing can mislabel hashed
+    # bundles (e.g. .css as application/javascript), which browsers refuse to
+    # apply — yielding an unstyled "plain HTML" page. Force the real type.
+    Write-Host "==> forcing content types on hashed assets" -ForegroundColor Cyan
+    Get-ChildItem -Recurse -File "dist\assets" | ForEach-Object {
+        $type = switch ($_.Extension.ToLowerInvariant()) {
+            ".css" { "text/css" }
+            ".js"  { "application/javascript" }
+            ".svg" { "image/svg+xml" }
+            ".png" { "image/png" }
+            ".ico" { "image/x-icon" }
+            ".woff2" { "font/woff2" }
+            default { $null }
+        }
+        if ($type) {
+            aws s3api copy-object --bucket $bucket --region $Region `
+                --content-type $type `
+                --copy-source "$bucket/assets/$($_.Name)" `
+                --key "assets/$($_.Name)" --metadata-directive REPLACE | Out-Null
+            if ($LASTEXITCODE -ne 0) { Write-Host "!! failed $($_.Name)" -ForegroundColor Red }
+        }
+    }
 }
 finally {
     Pop-Location
