@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timezone
+from decimal import Decimal
 from typing import Any, Optional
 
 _TABLE = os.environ.get("CASES_TABLE", "vouchmark-cases")
@@ -158,10 +159,18 @@ def _public_digest_item(item: dict) -> dict:
         "caseId": item.get("caseId"),
         "createdAt": item.get("createdAt"),
         "verdictLabel": item.get("verdictLabel"),
-        "fightScore": item.get("fightScore"),
+        "fightScore": _plain_num(item.get("fightScore")),
         "language": item.get("language"),
         "digest": digest,
     }
+
+
+def _plain_num(value: Any) -> Any:
+    """Numbers the frontend can JSON-parse: Decimal from DynamoDB -> int/float."""
+    if isinstance(value, Decimal):
+        as_float = float(value)
+        return int(value) if as_float.is_integer() else as_float
+    return value
 
 
 def _public_case(item: dict) -> dict:
@@ -173,7 +182,7 @@ def _public_case(item: dict) -> dict:
         "caseId": item.get("caseId"),
         "createdAt": item.get("createdAt"),
         "verdictLabel": item.get("verdictLabel"),
-        "fightScore": item.get("fightScore"),
+        "fightScore": _plain_num(item.get("fightScore")),
         "language": item.get("language"),
         "analysis": analysis,
         "digest": json.loads(item.get("digest") or "{}"),
