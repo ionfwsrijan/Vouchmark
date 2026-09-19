@@ -17,6 +17,7 @@ function Get-StackOutput($key) {
 if (-not $ApiUrl) { $ApiUrl = Get-StackOutput "ApiUrl" }
 $bucket = Get-StackOutput "FrontendBucketName"
 $domain = Get-StackOutput "CloudFrontUrl"
+if (-not $domain) { $domain = Get-StackOutput "S3WebsiteUrl" }
 if (-not $ApiUrl -or -not $bucket) {
     Write-Host "Could not read stack outputs. Deploy the backend first, or pass -ApiUrl / -Bucket." -ForegroundColor Red
     exit 1
@@ -53,4 +54,4 @@ if ($domain) {
 }
 
 Write-Host ""
-Write-Host "Live at: https://$domain (cache may take a minute to refresh)" -ForegroundColor Green
+Write-Host "Live at: $domain" -ForegroundColor Green

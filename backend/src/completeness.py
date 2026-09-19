@@ -6,7 +6,7 @@ letter*, rather than assuming the letter is complete. Deterministic.
 """
 from __future__ import annotations
 
-from .models import Extraction
+from models import Extraction
 
 # Fields whose absence should stop a user from sending the reply cold.
 CRITICAL_FIELDS: list[tuple[str, str]] = [

@@ -10,7 +10,7 @@ advice. The Bedrock Guardrail (see scripts/) reinforces that boundary.
 """
 from __future__ import annotations
 
-from .models import AnalysisContext, Assessment, Verdict
+from models import AnalysisContext, Assessment, Verdict
 
 # A "weak" ground means the insurer's reason likely does *not* hold.
 # A "strong" ground means the reason looks valid on its face.

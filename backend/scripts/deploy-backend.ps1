@@ -5,7 +5,7 @@ param(
     [string]$StackName = "vouchmark",
     [string]$Region = "",
     [string]$AllowedOrigin = "*",
-    [string]$ModelId = "anthropic.claude-sonnet-4-20250514",
+    [string]$ModelId = "anthropic.claude-sonnet-4-20250514-v1:0",
     [string]$GuardrailId = "",
     [string]$GuardrailVersion = "",
     [switch]$DemoMode

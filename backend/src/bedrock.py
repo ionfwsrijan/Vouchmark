@@ -21,7 +21,7 @@ def _bedrock_client():
 
 def default_model_id() -> str:
     return os.environ.get(
-        "BEDROCK_MODEL_ID", "anthropic.claude-sonnet-4-20250514"
+        "BEDROCK_MODEL_ID", "anthropic.claude-sonnet-4-20250514-v1:0"
     )
 
 

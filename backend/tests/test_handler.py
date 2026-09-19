@@ -98,7 +98,7 @@ def test_cases_without_device_returns_empty(monkeypatch):
 
 
 def test_cases_exposes_cursor(monkeypatch):
-    from src import ddb as ddb_mod
+    import ddb as ddb_mod
 
     monkeypatch.setattr(ddb_mod, "list_cases", lambda d, l, c=None: ([], "ck-1"))
     out = _req(
@@ -111,7 +111,7 @@ def test_cases_exposes_cursor(monkeypatch):
 
 
 def test_case_detail_returns_stored_analysis(monkeypatch):
-    from src import ddb as ddb_mod
+    import ddb as ddb_mod
 
     monkeypatch.setattr(
         ddb_mod,
@@ -133,7 +133,7 @@ def test_case_detail_returns_stored_analysis(monkeypatch):
 
 
 def test_case_detail_404_when_missing(monkeypatch):
-    from src import ddb as ddb_mod
+    import ddb as ddb_mod
 
     monkeypatch.setattr(ddb_mod, "get_case", lambda d, c: None)
     out = lambda_handler(

@@ -1,16 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  Vouchmark — the insurance claim rejection dispute assistant.
-  Reads a rejection letter (photo/PDF) with Amazon Bedrock vision, scores each
-  stated reason against an Indian health-policy rulebook, and drafts a counter
-  letter a family can actually send. Stack: Lambda + API Gateway + DynamoDB +
-  S3/CloudFront static frontend. Scales to zero; runs on the free-credit budget.
+Description: "Vouchmark: insurance claim rejection dispute assistant. Bedrock vision reads the letter, a rules engine scores each ground, and a counter letter is drafted. Stack: Lambda + API Gateway + DynamoDB + S3/CloudFront."
 
 Parameters:
   BedrockModelId:
     Type: String
-    Default: anthropic.claude-sonnet-4-20250514
+    Default: anthropic.claude-sonnet-4-20250514-v1:0
     Description: Bedrock model id (must be enabled for your account/region).
   DemoMode:
     Type: String
@@ -37,9 +32,16 @@ Parameters:
   CasesTtlDays:
     Type: Number
     Default: 90
+  UseCloudFront:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: "true = serve the site via CloudFront (account CloudFront-verified). false = S3 static website endpoint for an immediate demo."
 
 Conditions:
   EnableTtlCond: !Equals [!Ref EnableTtl, "true"]
+  UseCloudFrontCond: !Equals [!Ref UseCloudFront, "true"]
+  UseS3HostingCond: !Not [!Equals [!Ref UseCloudFront, "true"]]
 
 Resources:
   CasesTable:
@@ -66,10 +68,175 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      Cors:
-        AllowOrigin: !Ref AllowedOrigin
-        AllowHeaders: "'Content-Type,X-Requested-With'"
-        AllowMethods: "'GET,POST,OPTIONS'"
+      OpenApiVersion: "3.0.1"
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: Vouchmark
+          version: "1.0"
+        paths:
+          /health:
+            get:
+              responses:
+                "200":
+                  description: OK
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ClaimAnalyzerFunction.Arn}/invocations"
+            options:
+              responses:
+                "200":
+                  description: CORS
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Methods:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Headers:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                passthroughBehavior: WHEN_NO_TEMPLATES
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Requested-With'"
+                    responseTemplates:
+                      application/json: "{}"
+          /analyze:
+            post:
+              responses:
+                "200":
+                  description: Analysis
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ClaimAnalyzerFunction.Arn}/invocations"
+            options:
+              responses:
+                "200":
+                  description: CORS
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Methods:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Headers:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                passthroughBehavior: WHEN_NO_TEMPLATES
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Requested-With'"
+                    responseTemplates:
+                      application/json: "{}"
+          /cases:
+            get:
+              responses:
+                "200":
+                  description: Case list
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ClaimAnalyzerFunction.Arn}/invocations"
+            options:
+              responses:
+                "200":
+                  description: CORS
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Methods:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Headers:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                passthroughBehavior: WHEN_NO_TEMPLATES
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Requested-With'"
+                    responseTemplates:
+                      application/json: "{}"
+          /cases/{caseId}:
+            get:
+              parameters:
+                - name: caseId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                "200":
+                  description: Case detail
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ClaimAnalyzerFunction.Arn}/invocations"
+            options:
+              responses:
+                "200":
+                  description: CORS
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Methods:
+                      schema:
+                        type: string
+                    Access-Control-Allow-Headers:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                passthroughBehavior: WHEN_NO_TEMPLATES
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Requested-With'"
+                    responseTemplates:
+                      application/json: "{}"
+
+  AnalyzerApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ClaimAnalyzerFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/*/*"
 
   ClaimAnalyzerFunction:
     Type: AWS::Serverless::Function
@@ -105,31 +272,6 @@ Resources:
                 - dynamodb:Query
                 - dynamodb:PutItem
               Resource: !GetAtt CasesTable.Arn
-      Events:
-        AnalyzeApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /analyze
-            Method: POST
-        CasesApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /cases
-            Method: GET
-        CaseDetailApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /cases/{caseId}
-            Method: GET
-        HealthApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /health
-            Method: GET
 
   # ---- Static frontend: S3 + CloudFront with Origin Access Control -----------
   FrontendBucket:
@@ -137,12 +279,16 @@ Resources:
     Properties:
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
 
   FrontendOAC:
     Type: AWS::CloudFront::OriginAccessControl
+    Condition: UseCloudFrontCond
     Properties:
       OriginAccessControlConfig:
         Name: !Sub "${AWS::StackName}-oac"
@@ -153,6 +299,7 @@ Resources:
 
   FrontendDistribution:
     Type: AWS::CloudFront::Distribution
+    Condition: UseCloudFrontCond
     DependsOn: FrontendBucket
     Properties:
       DistributionConfig:
@@ -166,10 +313,10 @@ Resources:
             S3OriginConfig: {}
         DefaultCacheBehavior:
           TargetOriginId: s3Origin
-          ViewProtocolPolicy: redirect-to-https
+          ViewerProtocolPolicy: redirect-to-https
           Compress: true
           CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
-        ErrorResponses:
+        CustomErrorResponses:
           - ErrorCode: 403
             ResponseCode: 404
             ResponsePagePath: /index.html
@@ -179,6 +326,7 @@ Resources:
 
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    Condition: UseCloudFrontCond
     DependsOn: FrontendDistribution
     Properties:
       Bucket: !Ref FrontendBucket
@@ -189,19 +337,32 @@ Resources:
               Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub "${FrontendBucket.Arn}/*"
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub
-                  - "arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}"
-                  - distributionId: !Ref FrontendDistribution
+
+  FrontendPublicPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: UseS3HostingCond
+    DependsOn: FrontendBucket
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
 
 Outputs:
   ApiUrl:
     Description: "API Gateway base URL"
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   CloudFrontUrl:
-    Description: "Live frontend URL"
+    Condition: UseCloudFrontCond
+    Description: "Live frontend URL (CloudFront)"
     Value: !GetAtt FrontendDistribution.DomainName
+  S3WebsiteUrl:
+    Condition: UseS3HostingCond
+    Description: "Live frontend URL (S3 static website, no CloudFront)"
+    Value: !GetAtt FrontendBucket.WebsiteURL
   FrontendBucketName:
     Description: "S3 bucket holding the static site"
     Value: !Ref FrontendBucket

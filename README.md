@@ -136,6 +136,19 @@ py -m pytest backend/tests -q
 Toolbox: `aws` CLI (v2) + `aws-sam-cli` (`winget install AWS.SAM-CLI`), Node 18+.
 The $100 bonus credit + weekend credits cover the ~₹2-verification account.
 
+### Deployed (live now, ap-south-1)
+
+- **App URL:** http://vouchmark-frontendbucket-iqsq8qbdvv2j.s3-website.ap-south-1.amazonaws.com
+- **API:** https://jgnqzrzhhj.execute-api.ap-south-1.amazonaws.com/prod/
+- `DemoMode=true` is live until the account is granted Anthropic model access
+  (first-use approval is one-time and often needs use-case details — same
+  console step as "enable Claude Sonnet 4" below). Bedrock is confirmed
+  reachable; the model id needs the region's `-v1:0` suffix.
+- Two account-level gates remain: Anthropic invocation approval ("Operation not
+  allowed" on Converse) and CloudFront resource verification (needed to move
+  from the `http://` S3 URL to an HTTPS `cloudfront.net` URL — file an AWS
+  Support case, category "account and billing", and ask to enable CloudFront).
+
 ### Day 1 — every hour counts
 
 1. Verify your student Builder Center profile (needed to compete).
@@ -179,7 +192,7 @@ verdict + letter sizes. Works against the local demo server too.
 ### Secrets / pins
 
 - Model id is a stack parameter (`BedrockModelId`), default
-  `anthropic.claude-sonnet-4-20250514`. Change it if your region needs a
+  `anthropic.claude-sonnet-4-20250514-v1:0`. Change it if your region needs a
   different id.
 - `backend/samconfig.toml` holds the sane defaults (`sam build && sam deploy`
   from `backend/` works with no flag gymnastics); guardrail ids are passed on

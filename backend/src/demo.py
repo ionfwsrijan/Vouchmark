@@ -9,12 +9,12 @@ This is what powers:
 """
 from __future__ import annotations
 
-from .claim_math import shortfall_summary
-from .completeness import preparation
-from .extract import DISCLAIMER, extraction_from_dict
-from .letters import build_counter_letter, short_summary_markdown
-from .models import AnalysisContext
-from .rules import assess_all, decide_verdict
+from claim_math import shortfall_summary
+from completeness import preparation
+from extract import DISCLAIMER, extraction_from_dict
+from letters import build_counter_letter, short_summary_markdown
+from models import AnalysisContext
+from rules import assess_all, decide_verdict
 
 
 def demo_extraction_raw() -> dict:

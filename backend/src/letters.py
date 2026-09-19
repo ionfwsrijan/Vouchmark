@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from .models import AnalysisContext
+from models import AnalysisContext
 
 
 def _fmt(v: float | None) -> str:

@@ -11,13 +11,13 @@ import os
 import re
 from typing import Any, Optional
 
-from . import bedrock
-from .claim_math import shortfall_summary
-from .completeness import preparation
-from .letters import build_counter_letter, short_summary_markdown
-from .models import AnalysisContext, Assessment, Extraction, Verdict
-from .prompts import LETTER_PROMPT_TEMPLATE, SYSTEM_PROMPT, user_extraction_prompt
-from .rules import assess_all, decide_verdict, normalize_category
+import bedrock
+from claim_math import shortfall_summary
+from completeness import preparation
+from letters import build_counter_letter, short_summary_markdown
+from models import AnalysisContext, Assessment, Extraction, Verdict
+from prompts import LETTER_PROMPT_TEMPLATE, SYSTEM_PROMPT, user_extraction_prompt
+from rules import assess_all, decide_verdict, normalize_category
 
 DISCLAIMER = (
     "This is an informational assessment generated from the text you provided. "

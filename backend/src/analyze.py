@@ -7,7 +7,7 @@ Routes:
 
 Environment:
   DEMO_MODE           "1" -> skip Bedrock, use the deterministic demo pipeline
-  BEDROCK_MODEL_ID    e.g. anthropic.claude-sonnet-4-20250514
+  BEDROCK_MODEL_ID    e.g. anthropic.claude-sonnet-4-20250514-v1:0
   GUARDRAIL_ID        / GUARDRAIL_VERSION  (both set -> guardrail applied)
   CASES_TABLE         DynamoDB table name
   ALLOWED_ORIGIN      CORS origin ("*" default; set the hosted URL in prod)
@@ -19,13 +19,21 @@ import json
 import logging
 import os
 import re
+import sys
 import uuid
+from pathlib import Path
 from typing import Any, Optional
 
-from . import ddb
-from .demo import demo_analysis
-from .extract import AnalysisError, run_analysis
-from .models import AnalysisContext
+# Make sibling modules importable both locally (backend/src on sys.path) and
+# in the SAM bundle, which flattens CodeUri contents to the Lambda root.
+_SRC_DIR = str(Path(__file__).resolve().parent)
+if _SRC_DIR not in sys.path:
+    sys.path.insert(0, _SRC_DIR)
+
+import ddb
+from demo import demo_analysis
+from extract import AnalysisError, run_analysis
+from models import AnalysisContext
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger("vouchmark")
