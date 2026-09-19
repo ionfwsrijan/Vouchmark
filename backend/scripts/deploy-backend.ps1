@@ -8,9 +8,19 @@ param(
     [string]$ModelId = "anthropic.claude-sonnet-4-20250514-v1:0",
     [string]$GuardrailId = "",
     [string]$GuardrailVersion = "",
-    [switch]$DemoMode
+    [switch]$DemoMode,
+    [switch]$UseCloudFront
 )
 $ErrorActionPreference = "Stop"
+
+# sam is often pip-installed (not on PATH). Give a hint instead of a cryptic error.
+if (-not (Get-Command sam -ErrorAction SilentlyContinue)) {
+    Write-Host "The SAM CLI was not found on PATH." -ForegroundColor Red
+    Write-Host "  winget -> winget install AWS.SAM-CLI   |   pip -> pip install aws-sam-cli"
+    Write-Host "If installed via pip only, prepend its Scripts dir to PATH, e.g.:"
+    Write-Host '  $env:Path = "$env:LOCALAPPDATA\Programs\Python\Python313\Scripts;$env:Path"'
+    exit 1
+}
 
 if (-not $Region) {
     $Region = aws configure get region
@@ -21,7 +31,8 @@ if (-not $Region) {
 }
 
 $demo = if ($DemoMode) { "true" } else { "false" }
-$overrides = "BedrockModelId=$ModelId DemoMode=$demo AllowedOrigin=$AllowedOrigin GuardrailId=$GuardrailId GuardrailVersion=$GuardrailVersion"
+$cff = if ($UseCloudFront) { "true" } else { "false" }
+$overrides = "BedrockModelId=$ModelId DemoMode=$demo AllowedOrigin=$AllowedOrigin GuardrailId=$GuardrailId GuardrailVersion=$GuardrailVersion UseCloudFront=$cff"
 
 Write-Host "==> sam build" -ForegroundColor Cyan
 sam build

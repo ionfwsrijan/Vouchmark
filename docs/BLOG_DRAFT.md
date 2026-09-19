@@ -48,6 +48,20 @@ prompt engineering AS infrastructure; a vision model turns paperwork into
 structured data and that is a superpower; “one feature that runs” was a real
 discipline to hold.
 
+### 4b. What shipping actually taught this week (use if the story needs truth)
+Two account-level gates — CloudFront resource verification and Anthropic
+first-use approval — could have burned the weekend. The product decision that
+saved it was **the deterministic demo mode**: one env var forks to a fixture
+pipeline that shares the same rules engine, DDB writes, and counter-letter
+generator. Same letter, same verdict — which is also why every stress test
+still passes against the live stack. Lesson filed: *build the honest fallback
+first, then the model becomes the enhancement, not the dependency.*
+
+Messy real-world input taught the second lesson: a sample drawer full of tidy
+letters hides a product gap. The fix was a deliberately ugly fax letter
+(typos, smudged numbers, mixed case) and a stress test that feeds it through
+the live handler path — 121 pytest green and counting.
+
 ### 5. Link
 Repo, deployed URL, demo video (3 min).
 

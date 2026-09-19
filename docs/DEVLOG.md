@@ -52,15 +52,37 @@ judging line and for anyone reading the repository fresh. Roughly chronological.
 - `feat(ui)`: a "The numbers" card, a "Before you reply, gather these"
   checklist, and quote-from-the-letter chips on each reason card.
 
+## Live shipping and the honesty pass
+
+| Commit | What changed |
+|---|---|
+| `429b1de` | Live deploy wave: absolute imports, OpenAPI on API Gateway, `UseCloudFront` flag, ap-south-1 model id (`…-v1:0` suffix), pinned `src/requirements.txt`. |
+| `69fc93c` | DynamoDB `Decimal` fightScore fix (`_plain_num`) — the first thing a live `GET /cases` would have crashed on. |
+| `89955c3` | Oscar “Hot Blue” redesign: slate backdrop, white cards, status-tinted score ring and chips. |
+| `474e9cc` | Header nav wired to real features: Overview / Case history / How it works; every dummy control removed; nav copy bilingual. |
+| `d409a73` | Drop favicon, English default. |
+| current wave | Stress suite for messy letters (121st+ backend tests), problem-first page copy + demo script, S3 cache headers, hardened deploy-backend script. |
+
+Notes for the learning narrative:
+- **The two account gates are the real story.** Blocked on CloudFront resource
+  verification and Anthropic first-use approval in the same week; shipped with
+  `UseCloudFront=false` and `DemoMode=true` instead of not shipping.
+- **DemoMode is deterministic on purpose.** Same letter → same verdict. That is
+  testable in CI and keeps the demo honest on record day.
+
 ## Test scorecard (moving numbers)
 
-- **Backend (pytest, no AWS):** ~30 baseline → 83 → 104 → 115.
-- **Frontend (vitest + RTL):** 12 → 15 → 18 → 21.
+- **Backend (pytest, no AWS):** ~30 baseline → 83 → 104 → 115 → 121 (incl. the
+  messy-letter stress suite).
+- **Frontend (vitest + RTL):** 12 → 15 → 18 → 21 → 22.
+- **Browser e2e (Playwright):** 2 passing flows against a local demo server.
 - `npm run typecheck`, `npm run build`, and GitHub Actions CI are green on `main`.
 
 ## Honest gaps (next if there were another week)
 
-- Real Bedrock extraction-side evaluation set (today: fixtures + rules are deep,
-  model outputs are validated only structurally).
-- A live deployed URL under load; end-to-end against a real guardrail.
-- End-to-end browser test (Playwright) for the demo flow.
+- A real Bedrock extraction-side evaluation set (today: fixtures + rules are
+  deep; model outputs are validated structurally, not against a labeled corpus).
+- Running the real model end-to-end against the live stack once the account
+  approval lands; measuring latency and guardrail interplay under load.
+- A judging one-pager / landing that carries the same pitch as the video's
+  first ten seconds.

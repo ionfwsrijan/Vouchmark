@@ -75,12 +75,12 @@ vouchmark/
 │  │  ├─ demo.py                  # offline demo pipeline (no account)
 │  │  ├─ ddb.py                   # DynamoDB persistence (best-effort)
 │  │  ├─ prompts.py / models.py
-│  ├─ tests/                      # 115 pytest tests, no AWS required
+│  ├─ tests/                      # 121 pytest tests, no AWS required
 │  ├─ samples/letters/            # redacted sample rejection letters
 │  ├─ scripts/                    # create-guardrail / deploy-backend / deploy-frontend / run-local
 │  └─ tools/local_server.py       # HTTP server for the offline demo
 ├─ frontend/
-│  ├─ src/                        # Vite + React + TypeScript SPA (21 vitest tests)
+│  ├─ src/                        # Vite + React + TypeScript SPA (22 vitest tests)
 │  └─ public/config.js            # runtime-injected API URL
 ├─ .github/workflows/ci.yml       # pytest + typecheck + build on every push
 └─ docs/                          # ARCHITECTURE, DEMO_SCRIPT, BLOG_DRAFT, IRDAI_GUIDE, PRIVACY, DEVLOG
@@ -97,7 +97,7 @@ vouchmark/
 | **Safety rails** | Bedrock Guardrails config, a file-signature sniffer on uploads, size/MIME/language whitelists, and structured error codes (`code` field) on every 4xx/5xx. |
 | **Case store** | Per-device DynamoDB rows, full-analysis persistence, `GET /cases/{id}`, cursor pagination, optional TTL. |
 | **Frontend** | Client-side image downscale, N-language output, bilingual chrome (English/Hinglish), reopen-history, print-to-PDF, CSV export, numbers card, source-quote chips, pre-reply checklist. |
-| **Testing** | 118 backend pytest + 21 frontend vitest + Playwright browser e2e (demo server); `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
+| **Testing** | 121 backend pytest + 22 frontend vitest + Playwright browser e2e (demo server); `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
 | **Docs** | `docs/ARCHITECTURE.md`, `docs/IRDAI_GUIDE.md`, `docs/PRIVACY.md`, `docs/DEVLOG.md`, `docs/DEMO_SCRIPT.md`, `docs/BLOG_DRAFT.md`. |
 
 ---
@@ -140,6 +140,8 @@ The $100 bonus credit + weekend credits cover the ~₹2-verification account.
 
 - **App URL:** http://vouchmark-frontendbucket-iqsq8qbdvv2j.s3-website.ap-south-1.amazonaws.com
 - **API:** https://jgnqzrzhhj.execute-api.ap-south-1.amazonaws.com/prod/
+- Live verdicts are the output of a **deterministic rule engine** — the same
+  letter always gets the same answer, which is exactly what CI tests assert.
 - `DemoMode=true` is live until the account is granted Anthropic model access
   (first-use approval is one-time and often needs use-case details — same
   console step as "enable Claude Sonnet 4" below). Bedrock is confirmed
@@ -164,12 +166,13 @@ backend\scripts\create-guardrail.ps1
 ### Deploy (one time)
 
 ```powershell
-# 1. backend (prints ApiUrl, CloudFrontUrl, bucket)
-backend\scripts\deploy-backend.ps1 -Region ap-south-1 -AllowedOrigin "*" `
+# 1. backend (prints ApiUrl, bucket). Add -UseCloudFront once CloudFront
+#    resource verification is approved — until then it ships on the S3 URL.
+backend\scripts\deploy-backend.ps1 -Region ap-south-1 -DemoMode -AllowedOrigin "*" `
    -GuardrailId <id> -GuardrailVersion <v>
 
-# 2. frontend (build → inject API URL → s3 sync → invalidate CloudFront)
-backend\scripts\deploy-frontend.ps1 -Region ap-south-1
+# 2. frontend (build → inject API URL → s3 sync; invalidates CloudFront when used)
+backend\scripts\deploy-frontend.ps1 -Region ap-south-1 -ApiUrl <the ApiUrl above>
 ```
 
 That's it — a live URL on CloudFront, API on API Gateway, table on DynamoDB.
