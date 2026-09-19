@@ -18,28 +18,42 @@ zero-account **Build It** demo bundled in.
 
 ## See it in action
 
-### Landing
+**1. Bring your letter.** Paste the text or upload a photo/PDF. The right
+panel explains the three-step process before you've typed anything, so
+there's no confusion about what happens to the letter.
 
-[![Landing](docs/screenshots/landing.png)](docs/screenshots/landing.png)
+<img width="1919" height="1079" alt="Screenshot 2026-09-19 135951" src="https://github.com/user-attachments/assets/d053b75c-72c1-4aad-8bd8-cc48b5573405" />
 
-Problem-first pitch, no login, no forms.
+**2. Get a snapshot, not a black box.** Every check returns a 0–100 score,
+a plain-language headline ("On paper, 1 of the rejection grounds look
+weak"), and the claim's numbers — amount claimed, amount paid, and how it
+compares to the sum insured — pulled straight from the letter.
 
-### Analysis
+<img width="1919" height="1079" alt="Screenshot 2026-09-19 140019" src="https://github.com/user-attachments/assets/3ba57be9-a974-448e-961a-569a406ba060" />
 
-[![Analysis](docs/screenshots/verdict.png)](docs/screenshots/verdict.png)
+**3. Each reason, checked — not averaged into one score.** A `Pre-existing
+disease` ground shows as *"Opened — needs docs"* with the exact IRDAI
+PED-waiting-period logic and what discharge summary would settle it. A
+`Late intimation` ground used alone shows as *"Ground looks weak"*, with the
+regulatory basis (IRDAI treats intimation as a procedural duty, not
+grounds to repudiate a genuine claim by itself) and the specific line to
+write in reply.
 
-Score ring, per-reason strength + source quotes.
+<img width="1919" height="1079" alt="Screenshot 2026-09-19 140037" src="https://github.com/user-attachments/assets/755ba382-351c-4723-967b-1c5739724e1f" />
 
-### Counter letter
+**4. A letter you can actually send.** A full, addressed counter letter —
+grievance officer, policy and claim numbers, dated, with the 30-day escalation
+clause built in — ready to copy, print, or export alongside a CSV of every
+reason and its evidence checklist.
 
-[![History](docs/screenshots/history.png)](docs/screenshots/history.png)
+<img width="1917" height="1077" alt="Screenshot 2026-09-19 140045" src="https://github.com/user-attachments/assets/e0ace9ff-fc31-40de-9d97-95fddccb66aa" />
 
-Device-private history, reopen any past check.
+**5. Nothing pretends to be certain.** Every result carries the same
+footer: *"This is an informational assessment... not legal or financial
+advice... reviewed by you (and, where relevant, a certified advisor) before
+acting."* Past checks live in a private, no-login case history on the same
+device.
 
-The how-it-works modal and a mobile view are in
-[docs/screenshots/](docs/screenshots/) (`how-it-works.png`,
-`landing-mobile.png`). Capture them fresh any time with
-`node frontend/scripts/capture-screenshots.mjs`.
 
 ---
 
@@ -220,15 +234,6 @@ On-demand DynamoDB, one infrequent Lambda call per analysis, one Bedrock call
 scales to zero; there is no always-on server.
 
 ---
-
-## Demo-day checklist
-
-1. `DemoMode=true` fallback ready before the URL is needed. (it's default)
-2. `backend/samples/letters/` holds four letters — three clean scenarios plus a
-   deliberately **messy fax** (`sample_04`) that stress-tests parsing in CI.
-3. Record the 3-minute video per [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
-4. Write the AWS Builder Center blog post (`docs/BLOG_DRAFT.md`) — a separate
-   prize category that feeds the Learning score.
 
 ## Disclaimer
 
