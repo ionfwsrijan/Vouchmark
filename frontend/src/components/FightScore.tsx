@@ -4,9 +4,9 @@ interface Props {
 }
 
 const TONE_COLORS: Record<Props["tone"], string> = {
-  clay: "#c65d3b",
-  ok: "#2f7d5b",
-  amber: "#b7791f",
+  clay: "#d6533f",
+  ok: "#178543",
+  amber: "#d97706",
 };
 
 export function FightScore({ score, tone }: Props) {

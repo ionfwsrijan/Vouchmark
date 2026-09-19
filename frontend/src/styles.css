@@ -1,18 +1,18 @@
-/* Vouchmark design system — calm, paper-like, trustworthy. */
+/* Vouchmark design system — Oscar-style "Hot Blue" calm, clinical-clear. */
 :root {
-  --ink: #12221f;
-  --ink-soft: #3c4a46;
-  --forest: #0f3d36;
-  --forest-2: #1b5a4f;
-  --cream: #f6f2e8;
-  --card: #fffdf7;
-  --line: #e4dcc6;
-  --gold: #e9b44c;
-  --clay: #c65d3b;
-  --amber: #b7791f;
-  --ok: #2f7d5b;
-  --muted: #6c7572;
-  --shadow: 0 14px 40px rgba(18, 34, 31, 0.08);
+  --ink: #13213e;
+  --ink-soft: #4a5874;
+  --forest: #2b5cff;
+  --forest-2: #1b47d6;
+  --cream: #f5f7fc;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --gold: #2b5cff;
+  --clay: #d6533f;
+  --amber: #b45309;
+  --ok: #178543;
+  --muted: #667085;
+  --shadow: 0 14px 40px rgba(16, 25, 48, 0.08);
   --serif: Georgia, "Times New Roman", Cambria, serif;
   --sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius: 16px;
@@ -30,7 +30,7 @@ body {
 
 body {
   background:
-    radial-gradient(1200px 500px at 85% -10%, rgba(233, 180, 76, 0.12), transparent 60%),
+    radial-gradient(1200px 500px at 85% -10%, rgba(43, 92, 255, 0.1), transparent 60%),
     var(--cream);
   color: var(--ink);
   font-family: var(--sans);
@@ -98,7 +98,7 @@ button {
   padding: 8px 30px 8px 14px;
   font-size: 0.85rem;
   color: var(--ink-soft);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%233c4a46' stroke-width='1.6'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%234a5874' stroke-width='1.6'/></svg>");
   background-repeat: no-repeat;
   background-position: right 12px center;
   cursor: pointer;
@@ -107,7 +107,7 @@ button {
 /* ---------- buttons ---------- */
 .primary-btn {
   background: var(--forest);
-  color: #fdf9ef;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   padding: 13px 22px;
@@ -209,7 +209,7 @@ button {
 .dropzone:hover,
 .dropzone.dragging {
   border-color: var(--gold);
-  background: rgba(233, 180, 76, 0.05);
+  background: rgba(43, 92, 255, 0.05);
 }
 
 .dropzone.has-file {
@@ -248,7 +248,7 @@ button {
 .paste-area:focus,
 .lang-select:focus,
 input:focus {
-  outline: 2px solid rgba(27, 90, 79, 0.35);
+  outline: 2px solid rgba(43, 92, 255, 0.4);
   outline-offset: 1px;
   border-color: var(--forest-2);
 }
@@ -316,7 +316,7 @@ input:focus {
   gap: 10px;
   margin-top: 16px;
   padding: 12px 14px;
-  background: rgba(27, 90, 79, 0.06);
+  background: rgba(43, 92, 255, 0.06);
   border-radius: 12px;
   color: var(--forest-2);
   font-size: 0.86rem;
@@ -325,7 +325,7 @@ input:focus {
 .spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(27, 90, 79, 0.25);
+  border: 2px solid rgba(43, 92, 255, 0.25);
   border-top-color: var(--forest-2);
   border-radius: 50%;
   animation: spin 0.9s linear infinite;
@@ -346,9 +346,9 @@ input:focus {
 }
 
 .alert.error {
-  background: rgba(198, 93, 59, 0.09);
-  border: 1px solid rgba(198, 93, 59, 0.3);
-  color: #8a3d22;
+  background: rgba(214, 83, 63, 0.09);
+  border: 1px solid rgba(214, 83, 63, 0.3);
+  color: #9a2b1a;
 }
 
 .actions-row {
@@ -402,7 +402,7 @@ input:focus {
   height: 26px;
   border-radius: 50%;
   background: var(--forest);
-  color: #fdf9ef;
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
@@ -425,18 +425,18 @@ input:focus {
 }
 
 .verdict-banner.clay {
-  background: linear-gradient(135deg, #fdf1ec, #f9e3d8);
-  border: 1px solid rgba(198, 93, 59, 0.35);
+  background: linear-gradient(135deg, #fdf1ee, #f9e2da);
+  border: 1px solid rgba(214, 83, 63, 0.35);
 }
 
 .verdict-banner.ok {
-  background: linear-gradient(135deg, #eef7f1, #ddeee3);
-  border: 1px solid rgba(47, 125, 91, 0.35);
+  background: linear-gradient(135deg, #eef8f2, #dcefe3);
+  border: 1px solid rgba(23, 133, 67, 0.35);
 }
 
 .verdict-banner.amber {
-  background: linear-gradient(135deg, #fbf4e2, #f6e9c2);
-  border: 1px solid rgba(183, 121, 31, 0.35);
+  background: linear-gradient(135deg, #fdf6e9, #f8ecce);
+  border: 1px solid rgba(180, 83, 9, 0.35);
 }
 
 .verdict-copy h2 {
@@ -463,18 +463,18 @@ input:focus {
 }
 
 .verdict-tag.clay {
-  background: rgba(198, 93, 59, 0.14);
-  color: #8a3d22;
+  background: rgba(214, 83, 63, 0.14);
+  color: #9a2b1a;
 }
 
 .verdict-tag.ok {
-  background: rgba(47, 125, 91, 0.14);
-  color: #1f5c42;
+  background: rgba(23, 133, 67, 0.14);
+  color: #10603a;
 }
 
 .verdict-tag.amber {
-  background: rgba(183, 121, 31, 0.16);
-  color: #83510f;
+  background: rgba(180, 83, 9, 0.16);
+  color: #83460a;
 }
 
 /* fight score ring */
@@ -520,7 +520,7 @@ input:focus {
 }
 
 .doc-facts span {
-  background: #f0ead9;
+  background: #eef2f8;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 0.78rem;
@@ -572,8 +572,8 @@ input:focus {
 
 /* preparation checklist */
 .prep-card {
-  background: rgba(183, 121, 31, 0.07);
-  border: 1px dashed rgba(183, 121, 31, 0.45);
+  background: rgba(180, 83, 9, 0.06);
+  border: 1px dashed rgba(180, 83, 9, 0.45);
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 4px;
@@ -589,7 +589,7 @@ input:focus {
 
 .prep-critical {
   font-weight: 700;
-  color: #83510f;
+  color: #83460a;
 }
 
 .prep-optional {
@@ -601,7 +601,7 @@ input:focus {
   margin: 10px 0 0;
   padding: 8px 12px;
   border-left: 3px solid var(--gold);
-  background: var(--paper-2, #f4f0e8);
+  background: var(--paper-2, #f3f6fb);
   font-family: var(--serif);
   font-style: italic;
   font-size: 0.84rem;
@@ -647,18 +647,18 @@ input:focus {
 }
 
 .strength-chip.weak {
-  background: rgba(198, 93, 59, 0.12);
-  color: #8a3d22;
+  background: rgba(214, 83, 63, 0.12);
+  color: #9a2b1a;
 }
 
 .strength-chip.strong {
-  background: rgba(47, 125, 91, 0.12);
-  color: #1f5c42;
+  background: rgba(23, 133, 67, 0.12);
+  color: #10603a;
 }
 
 .strength-chip.undetermined {
-  background: rgba(183, 121, 31, 0.14);
-  color: #83510f;
+  background: rgba(180, 83, 9, 0.14);
+  color: #83460a;
 }
 
 .reason-label {
@@ -678,8 +678,8 @@ input:focus {
   font-size: 0.84rem;
   line-height: 1.5;
   padding: 8px 10px;
-  border-left: 3px solid var(--forest-2, #2f7d5b);
-  background: var(--paper-2, #f4f0e8);
+  border-left: 3px solid var(--forest-2, #2b5cff);
+  background: var(--paper-2, #f3f6fb);
   color: var(--ink);
 }
 
@@ -754,11 +754,11 @@ input:focus {
 .disclaimer {
   margin-top: 18px;
   padding: 12px 14px;
-  background: rgba(233, 180, 76, 0.1);
-  border: 1px solid rgba(233, 180, 76, 0.4);
+  background: rgba(180, 83, 9, 0.08);
+  border: 1px solid rgba(180, 83, 9, 0.3);
   border-radius: 12px;
   font-size: 0.78rem;
-  color: #7a5a12;
+  color: #7c4509;
 }
 
 .meta-row {
@@ -772,7 +772,7 @@ input:focus {
 .chip {
   font-size: 0.7rem;
   color: var(--muted);
-  background: #f1ecdd;
+  background: #eef2f8;
   border-radius: 999px;
   padding: 3px 9px;
 }
@@ -795,14 +795,14 @@ input:focus {
   border-radius: 50%;
   border: none;
   background: var(--forest);
-  color: #fdf9ef;
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  box-shadow: 0 8px 24px rgba(15, 61, 54, 0.3);
+  box-shadow: 0 8px 24px rgba(27, 71, 214, 0.3);
 }
 
 .history-float:hover {
@@ -912,7 +912,7 @@ input:focus {
 
 /* ---------- a11y ---------- */
 :focus-visible {
-  outline: 3px solid rgba(233, 180, 76, 0.55);
+  outline: 3px solid rgba(43, 92, 255, 0.5);
   outline-offset: 2px;
   border-radius: 6px;
 }
