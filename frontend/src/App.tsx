@@ -44,7 +44,7 @@ export default function App() {
     const [file, setFile] = useState<File | null>(null);
     const [fileError, setFileError] = useState<string | null>(null);
     const [pastedText, setPastedText] = useState("");
-    const [language, setLanguage] = useState("Hinglish");
+    const [language, setLanguage] = useState("English");
     const [context, setContext] = useState<ContextInput>({});
     const [showContext, setShowContext] = useState(false);
 
@@ -203,7 +203,6 @@ export default function App() {
         <div className="shell">
             <header className="topbar">
                 <div className="brand">
-                    <img src="./favicon.svg" alt="" width="30" height="30" />
                     <div>
                         <span className="brand-name">Vouchmark</span>
                         <span className="brand-tag">{t.brandTag}</span>
