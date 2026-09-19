@@ -164,12 +164,9 @@ vouchmark/
 
 ### Pipeline, in one line
 
-```
-photo/PDF or text ---> Bedrock vision ---> rules engine ---> counter letter
-                       (Claude 4)         (deterministic)    + numbers + checklist
-                                                |
-                              DynamoDB history ---> reopen / PDF / CSV
-```
+
+<img width="2720" height="2864" alt="vouchmark_pipeline" src="https://github.com/user-attachments/assets/34414ba5-704a-4791-bd4b-b4576af9011c" />
+
 
 ## Depth, at a glance
 
