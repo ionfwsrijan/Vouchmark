@@ -29,6 +29,7 @@ describe("uiStrings", () => {
         "navOverview",
         "navHistory",
         "navHow",
+        "navGrounds",
         "eyebrow",
         "heroA",
         "heroB",
@@ -38,6 +39,32 @@ describe("uiStrings", () => {
         "kickerResult",
         "howHeading",
         "close",
+      ] as const) {
+        expect(t[key].length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("ships rulebook chrome and content blocks in both languages", () => {
+    for (const lang of ["English", "Hinglish"]) {
+      const t = uiStrings(lang);
+      for (const key of [
+        "groundsKicker",
+        "groundsHeading",
+        "groundsIntro",
+        "groundsSearchAria",
+        "groundsSearchPlaceholder",
+        "groundsFilterAll",
+        "groundsFilterWeak",
+        "groundsFilterUndetermined",
+        "groundsFilterStrong",
+        "groundsWhy",
+        "groundsMove",
+        "groundsWeight",
+        "groundsNone",
+        "timelinesTitle",
+        "grievancesTitle",
+        "groundsNote",
       ] as const) {
         expect(t[key].length).toBeGreaterThan(0);
       }

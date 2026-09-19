@@ -61,6 +61,9 @@ judging line and for anyone reading the repository fresh. Roughly chronological.
 | `89955c3` | Oscar “Hot Blue” redesign: slate backdrop, white cards, status-tinted score ring and chips. |
 | `474e9cc` | Header nav wired to real features: Overview / Case history / How it works; every dummy control removed; nav copy bilingual. |
 | `d409a73` | Drop favicon, English default. |
+| `874fb4f` | README in production English: dev-URL first, hard timeline caveats, honest CloudFront + Bedrock gate status, no decorative emoji. |
+| `ef20021` | 121-test stress suite against a deliberately messy fax-letter (`sample_04`) + a Playwright screenshot pipeline captured straight from the live S3 site into `docs/screenshots/`. |
+| `e65bfc8` | Frontend grew a fourth surface: **The rulebook** — every rejection ground as a filterable, searchable card (search + strength filter), IRDAI-timeline and grievance-arc cheat sheets, bilingual chrome. 23 vitest + 3 e2e flows; README shows the app in real screenshots. |
 | current wave | Stress suite for messy letters (121st+ backend tests), problem-first page copy + demo script, S3 cache headers, hardened deploy-backend script. |
 
 Notes for the learning narrative:

@@ -3,6 +3,7 @@ export interface UICopy {
   navOverview: string;
   navHistory: string;
   navHow: string;
+  navGrounds: string;
   eyebrow: string;
   heroA: string;
   heroB: string;
@@ -31,6 +32,22 @@ export interface UICopy {
   footer: string;
   historyHeading: string;
   historyEmpty: string;
+  groundsKicker: string;
+  groundsHeading: string;
+  groundsIntro: string;
+  groundsSearchAria: string;
+  groundsSearchPlaceholder: string;
+  groundsFilterAll: string;
+  groundsFilterWeak: string;
+  groundsFilterUndetermined: string;
+  groundsFilterStrong: string;
+  groundsWhy: string;
+  groundsMove: string;
+  groundsWeight: string;
+  groundsNone: string;
+  timelinesTitle: string;
+  grievancesTitle: string;
+  groundsNote: string;
 }
 
 const ENGLISH: UICopy = {
@@ -38,6 +55,7 @@ const ENGLISH: UICopy = {
   navOverview: "Overview",
   navHistory: "Case history",
   navHow: "How it works",
+  navGrounds: "The rulebook",
   eyebrow: "Claims / new review",
   heroA: "Make your claim",
   heroB: "count.",
@@ -88,6 +106,27 @@ const ENGLISH: UICopy = {
     "Built for the AWS First Commit hackathon · Amazon Bedrock + Lambda + API Gateway + DynamoDB + CloudFront · a rejection is a disagreement, not a verdict",
   historyHeading: "Past checks on this device",
   historyEmpty: "Nothing here yet — your first check will appear.",
+  groundsKicker: "03 · The rulebook",
+  groundsHeading: "Why each reason is — or isn't — fightable",
+  groundsIntro:
+    "The exact engine behind every verdict, in plain language. Each rejection "
+    + "ground, why Indian insurers use it, and the move that changes the outcome.",
+  groundsSearchAria: "Search the rulebook",
+  groundsSearchPlaceholder: "Search a ground… e.g. pre-existing",
+  groundsFilterAll: "All grounds",
+  groundsFilterWeak: "Often contestable",
+  groundsFilterUndetermined: "Facts decide",
+  groundsFilterStrong: "Looks valid",
+  groundsWhy: "Why it's treated this way",
+  groundsMove: "Your best move",
+  groundsWeight: "How Vouchmark weighs it",
+  groundsNone: "Nothing matches that search.",
+  timelinesTitle: "Timelines people argue about",
+  grievancesTitle: "The grievance arc",
+  groundsNote:
+    "Educational summary of how Indian health policies behave under IRDAI's "
+    + "regulatory frame — direction, not advice. Confirm current circulars and "
+    + "your own policy wording before relying on anything here.",
 };
 
 const HINGLISH: UICopy = {
@@ -95,6 +134,7 @@ const HINGLISH: UICopy = {
   navOverview: "Overview",
   navHistory: "Case history",
   navHow: "Kaise kaam karta hai",
+  navGrounds: "Rulebook",
   eyebrow: "Claims / naya review",
   heroA: "Apne claim ko",
   heroB: "asli banayein.",
@@ -145,6 +185,28 @@ const HINGLISH: UICopy = {
     "AWS First Commit hackathon ke liye banaya · Amazon Bedrock + Lambda + API Gateway + DynamoDB + CloudFront · rejection ek disagreement hai, verdict nahi",
   historyHeading: "Is par device ke purane checks",
   historyEmpty: "Abhi kuch nahi — aapka pehla check yahan dikhega.",
+  groundsKicker: "03 · Rulebook",
+  groundsHeading: "Har reason fightable kyun hai — ya nahi",
+  groundsIntro:
+    "Har verdict ke peeche ka wohi engine, saaf bhasha mein. Har rejection "
+    + "ground, Indian insurers ise kyun use karte hain, aur woh kadam jo natija "
+    + "badal sakta hai.",
+  groundsSearchAria: "Rulebook mein dhoondein",
+  groundsSearchPlaceholder: "Ground dhoondein… jaise pre-existing",
+  groundsFilterAll: "Sab grounds",
+  groundsFilterWeak: "Aksar contestable",
+  groundsFilterUndetermined: "Facts decide",
+  groundsFilterStrong: "Sahi lagta hai",
+  groundsWhy: "Aisa kyun maana jaata hai",
+  groundsMove: "Aapka sabse achha kadam",
+  groundsWeight: "Vouchmark ise kaise tolta hai",
+  groundsNone: "Is search se kuch match nahi hua.",
+  timelinesTitle: "Timelines jinse log ladte hain",
+  grievancesTitle: "Shikayat ka sahi rasta",
+  groundsNote:
+    "Indian health policies ke behave karne ke IRDAI frame ka educational "
+    + "summary — direction, advice nahi. Bherosa karne se pehle current circulars "
+    + "aur apni policy ki wording confirm karo.",
 };
 
 export function uiStrings(language: string): UICopy {

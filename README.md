@@ -3,7 +3,7 @@
 > *A rejection is not a verdict. It's a claim — vouch it, then reply.*
 
 ![CI](https://github.com/ionfwsrijan/Vouchmark/actions/workflows/ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-121_backend_%2B_22_frontend_%2B_2_e2e-2B5CFF)
+![Tests](https://img.shields.io/badge/tests-121_backend_%2B_23_frontend_%2B_3_e2e-2B5CFF)
 ![Stack](https://img.shields.io/badge/stack-Bedrock%20%E2%80%A2%20Lambda%20%E2%80%A2%20API%20Gateway%20%E2%80%A2%20DynamoDB%20%E2%80%A2%20S3-232F3E?logo=amazonaws)
 ![Live](https://img.shields.io/badge/live-ap--south--1-success)
 ![Lang](https://img.shields.io/badge/Python-3.12-3776AB?logo=python) ![Lang](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![Lang](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
@@ -129,8 +129,8 @@ deterministic rules + letter builder. No account, no card, no Docker.
 
 ```powershell
 py -m pytest backend/tests -q        # 121 backend tests
-cd frontend; npm test                # 22 vitest tests
-cd frontend; npm run e2e             # 2 Playwright flows vs local demo server
+cd frontend; npm test                # 23 vitest tests
+cd frontend; npm run e2e             # 3 Playwright flows vs local demo server
 ```
 
 ---
@@ -155,7 +155,7 @@ vouchmark/
 │  ├─ scripts/                    # create-guardrail / deploy-backend / deploy-frontend / run-local
 │  └─ tools/local_server.py       # HTTP server for the offline demo
 ├─ frontend/
-│  ├─ src/                        # Vite + React + TypeScript SPA (22 vitest tests)
+│  ├─ src/                        # Vite + React + TypeScript SPA (23 vitest tests)
 │  ├─ scripts/                    # e2e server, point-local-api, capture-screenshots
 │  └─ public/config.js            # runtime-injected API URL
 ├─ .github/workflows/ci.yml       # pytest + typecheck + build on every push
@@ -177,7 +177,7 @@ vouchmark/
 | **Safety rails** | Bedrock Guardrails, file-signature sniffer on uploads, size/MIME/language whitelists, structured `code` on every 4xx/5xx. |
 | **Case store** | Per-device DynamoDB rows, full-analysis persistence, `GET /cases/{id}`, cursor pagination, optional TTL. |
 | **Frontend** | Client-side image downscale, N-language output, bilingual chrome (EN/Hinglish), reopen-history, print-to-PDF, CSV export, numbers card, source-quote chips, pre-reply checklist. |
-| **Testing** | 121 backend pytest + 22 frontend vitest + 2 Playwright e2e; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
+| **Testing** | 121 backend pytest + 23 frontend vitest + 3 Playwright e2e; `npm run build` and `tsc -b` clean; CI on GitHub Actions. |
 | **Docs** | ARCHITECTURE · IRDAI_GUIDE · PRIVACY · DEVLOG · DEMO_SCRIPT · BLOG_DRAFT. |
 
 ---

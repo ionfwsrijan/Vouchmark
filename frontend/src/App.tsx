@@ -5,11 +5,12 @@ import { Dropzone } from "./components/Dropzone";
 import { ContextPanel } from "./components/ContextPanel";
 import { VerdictView } from "./components/VerdictView";
 import { HistoryDrawer } from "./components/HistoryDrawer";
+import { Rulebook } from "./components/Rulebook";
 import { uiStrings } from "./i18n";
 
 type Tab = "upload" | "paste";
 type Status = "idle" | "working" | "done" | "error";
-type View = "overview" | "history" | "how";
+type View = "overview" | "history" | "how" | "grounds";
 
 const LANGUAGES = [
     "English",
@@ -230,6 +231,13 @@ export default function App() {
                     >
                         {t.navHow}
                     </button>
+                    <button
+                        className="nav-item"
+                        aria-current={view === "grounds" ? "page" : undefined}
+                        onClick={() => setView("grounds")}
+                    >
+                        {t.navGrounds}
+                    </button>
                 </nav>
                 <div className="topbar-actions">
                     <select
@@ -248,7 +256,11 @@ export default function App() {
             </header>
 
             <main>
-                <div className="workspace-heading">
+                {view === "grounds" ? (
+                    <Rulebook t={t} />
+                ) : (
+                    <>
+                        <div className="workspace-heading">
                     <div>
                         <p className="eyebrow">{t.eyebrow}</p>
                         <h1>
@@ -403,7 +415,9 @@ export default function App() {
                             </div>
                         )}
                     </section>
-                </div>
+                        </div>
+                    </>
+                )}
             </main>
 
             {history && (history.length > 0 || showHistory) && (
