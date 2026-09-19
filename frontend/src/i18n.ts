@@ -1,5 +1,17 @@
 export interface UICopy {
   brandTag: string;
+  navOverview: string;
+  navHistory: string;
+  navHow: string;
+  eyebrow: string;
+  heroA: string;
+  heroB: string;
+  heroCopy: string;
+  secureNote: string;
+  kickerInput: string;
+  kickerResult: string;
+  howHeading: string;
+  close: string;
   outputLangLabel: string;
   trySample: string;
   uploadTab: string;
@@ -22,7 +34,20 @@ export interface UICopy {
 }
 
 const ENGLISH: UICopy = {
-  brandTag: "your rejection, vouched",
+  brandTag: "Claim intelligence desk",
+  navOverview: "Overview",
+  navHistory: "Case history",
+  navHow: "How it works",
+  eyebrow: "Claims / new review",
+  heroA: "Make your claim",
+  heroB: "count.",
+  heroCopy:
+    "Turn a confusing rejection letter into a clear next step, with evidence on your side.",
+  secureNote: "Private workspace",
+  kickerInput: "Bring your letter",
+  kickerResult: "Your claim snapshot",
+  howHeading: "How Vouchmark works",
+  close: "Close",
   outputLangLabel: "Output language",
   trySample: "Try a sample",
   uploadTab: "Upload a letter",
@@ -66,7 +91,20 @@ const ENGLISH: UICopy = {
 };
 
 const HINGLISH: UICopy = {
-  brandTag: "aapki rejection, vouched",
+  brandTag: "Claim intelligence desk",
+  navOverview: "Overview",
+  navHistory: "Case history",
+  navHow: "Kaise kaam karta hai",
+  eyebrow: "Claims / naya review",
+  heroA: "Apne claim ko",
+  heroB: "asli banayein.",
+  heroCopy:
+    "Bhramit karne wali rejection letter ko ek saaf agla kadam banao — evidence apni taraf ho.",
+  secureNote: "Private workspace",
+  kickerInput: "Apni letter lao",
+  kickerResult: "Aapka claim snapshot",
+  howHeading: "Vouchmark kaise kaam karta hai",
+  close: "Band karo",
   outputLangLabel: "Output language",
   trySample: "Sample try karo",
   uploadTab: "Letter upload karo",

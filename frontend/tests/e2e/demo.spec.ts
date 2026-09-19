@@ -9,7 +9,7 @@ test("sample letter loads into the paste box, then runs end-to-end", async ({ pa
   await useEnglish(page);
   await expect(page.getByText("If an insurer says “no”, is that the whole story?")).toBeVisible();
 
-  await page.locator("header").getByRole("button", { name: "Try a sample" }).click();
+  await page.getByRole("button", { name: "Try a sample" }).first().click();
   await expect(page.getByRole("textbox")).toHaveValue(/Claim No: CLM20260828-00741/);
 
   await page.getByRole("button", { name: "Check this rejection" }).click();
