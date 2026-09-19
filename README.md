@@ -22,14 +22,18 @@ zero-account **Build It** demo bundled in.
 panel explains the three-step process before you've typed anything, so
 there's no confusion about what happens to the letter.
 
+
 <img width="1919" height="1079" alt="Screenshot 2026-09-19 135951" src="https://github.com/user-attachments/assets/d053b75c-72c1-4aad-8bd8-cc48b5573405" />
+
 
 **2. Get a snapshot, not a black box.** Every check returns a 0–100 score,
 a plain-language headline ("On paper, 1 of the rejection grounds look
 weak"), and the claim's numbers — amount claimed, amount paid, and how it
 compares to the sum insured — pulled straight from the letter.
 
+
 <img width="1919" height="1079" alt="Screenshot 2026-09-19 140019" src="https://github.com/user-attachments/assets/3ba57be9-a974-448e-961a-569a406ba060" />
+
 
 **3. Each reason, checked — not averaged into one score.** A `Pre-existing
 disease` ground shows as *"Opened — needs docs"* with the exact IRDAI
@@ -39,14 +43,18 @@ regulatory basis (IRDAI treats intimation as a procedural duty, not
 grounds to repudiate a genuine claim by itself) and the specific line to
 write in reply.
 
+
 <img width="1919" height="1079" alt="Screenshot 2026-09-19 140037" src="https://github.com/user-attachments/assets/755ba382-351c-4723-967b-1c5739724e1f" />
+
 
 **4. A letter you can actually send.** A full, addressed counter letter —
 grievance officer, policy and claim numbers, dated, with the 30-day escalation
 clause built in — ready to copy, print, or export alongside a CSV of every
 reason and its evidence checklist.
 
+
 <img width="1917" height="1077" alt="Screenshot 2026-09-19 140045" src="https://github.com/user-attachments/assets/e0ace9ff-fc31-40de-9d97-95fddccb66aa" />
+
 
 **5. Nothing pretends to be certain.** Every result carries the same
 footer: *"This is an informational assessment... not legal or financial
